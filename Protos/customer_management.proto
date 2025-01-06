@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+package CustomerManagement;
+
+service CustomerManagement{
+
+//ReadSingle
+rpc ReadCustomerManagement(ReadCustomerRequest) returns (ReadCustomerManagementResponse){}
+
+//Readlist
+rpc ListCustomerManagement(GetListCustomerManagementRequest) returns (GetListCustomerManagementResponse){}
+
+}
+
+message GetListCustomerManagementRequest
+{
+}
+
+message GetItemInListCustomerResponse{
+	int32 IdCusomer = 1;
+	string CustomerName = 2;
+	string CustomerEmail = 3;
+	string CustomerPhone = 4;
+	string CustomerAdrress = 5;
+}
+
+message GetListCustomerManagementResponse{
+	repeated GetItemInListCustomerResponse toCustomerList = 1;
+}
+
+message ReadCustomerRequest{
+	int32 IdCusomer = 1;
+}
+
+message ReadItemDeviceCustomerManagementResponse
+{
+	int32 IdCusomer = 1;
+	string CustomerName = 2;
+	string CustomerEmail = 3;
+	string CustomerPhone = 4;
+	string CustomerAdrress = 5;
+	string CustomerDevice = 6;
+	int32 IdWarrantReport = 7;
+	string DateOfWarrant = 8;
+	string TimeEnd = 9;
+}
+
+message ReadCustomerManagementResponse{
+	repeated ReadItemDeviceCustomerManagementResponse toDeviceList = 1;
+}
+

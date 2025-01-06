@@ -1,0 +1,77 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+package RepairManagement;
+
+service RepairManagement{
+
+//Create
+rpc CreateRepairManagement(CreateRepairManagementRequest) returns (CreateRepairManagementResponse){}
+
+//ReadSingle
+rpc ReadRepairManagement(ReadToRequest) returns (ReadRepairManagementResponse){}
+
+//Readlist
+rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairManagementResponse){}
+
+//Update
+rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){}
+
+}
+
+
+message CreateRepairManagementRequest{
+	string CustomerName = 1;
+	string CustomerEmail = 2;
+	string CustomerPhone = 3;
+	string DeviceName = 4;
+	int32 IdWarrantRecord = 5;
+	string ReasonBringFix = 6;
+}
+
+message CreateRepairManagementResponse{
+	int32 IdTask = 1;
+}
+
+
+message ReadToRequest{
+	int32 IdTask = 1;
+}
+
+message ReadRepairManagementResponse{
+	int32 IdTask = 1;
+	string CustomerName = 2;
+	string CustomerPhone = 3;
+	int32 StatusTask = 4;
+	string ReasonBringFix = 5;
+}
+
+message GetListRepairManagementRequest{
+	int32 IdStaff = 1;
+}
+
+message ReadItemRepairManagementResponse {
+  int32 IdTask = 1;
+  string CustomerName = 2;
+  string CustomerPhone = 3;
+  string DateOfTask = 4;
+  string DateOfWarranty = 5;
+  int32 IdWarrantRecord = 6;
+  int32 StatusTask = 7;
+}
+
+message GetListRepairManagementResponse {
+  repeated ReadItemRepairManagementResponse toList = 1;
+}
+
+
+
+message UpdateRepairManagementRequest{
+	int32 IdTask = 1;
+}
+
+message UpdateRepairManagementResponse{
+	int32 IdTask = 1;
+}
+
