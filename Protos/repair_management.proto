@@ -2,24 +2,43 @@
 
 option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
 
+import "google/api/annotations.proto";
+
 package RepairManagement;
 
 service RepairManagement{
 
 //Create
-rpc CreateRepairManagement(CreateRepairManagementRequest) returns (CreateRepairManagementResponse){}
+	rpc CreateRepairManagement(CreateRepairManagementRequest) returns (CreateRepairManagementResponse){
+		option (google.api.http) = {
+				post: "/api/RepairManagement/CreateRepairManagement",
+				body: "*"
+		};
+	}
 
 //ReadSingleStaffTasKDDone
-rpc ReadRepairDone(ReadToRequest) returns (ReadRepairManagementResponse){}
+	rpc ReadRepairDone(ReadToRequest) returns (ReadRepairManagementResponse){
+		option (google.api.http) = {
+				get: "/api/RepairManagement/ReadRepairDone/{IdTask}"
+		};
+	}
 
-//Readlist
-rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairManagementResponse){}
+	//Readlist
+	rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairManagementResponse){
+		option (google.api.http) = {
+				get: "/api/RepairManagement/ListRepairManagement/{IdStaff}"
+		};
+	}
 
-//Update
-rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){}
+	//Update
+	rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){}
 
-//ReadSingleStaffTaskNotDone
-rpc ReadRepairNotDone(ReadToRequest) returns (ReadItemRepairNotDoneResponse){}
+	//ReadSingleStaffTaskNotDone
+	rpc ReadRepairNotDone(ReadToRequest) returns (ReadItemRepairNotDoneResponse){
+		option (google.api.http) = {
+				get: "/api/RepairManagement/ReadRepairNotDone/{IdTask}"
+		};
+	}
 }
 
 

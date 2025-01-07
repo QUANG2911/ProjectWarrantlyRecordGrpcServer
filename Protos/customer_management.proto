@@ -1,16 +1,26 @@
-syntax = "proto3";
+﻿syntax = "proto3";
 
 option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+import "google/api/annotations.proto";
 
 package CustomerManagement;
 
 service CustomerManagement{
 
-//ReadSingle
-rpc ReadCustomerManagement(ReadCustomerRequest) returns (ReadCustomerManagementResponse){}
+	//ReadSingle
+	rpc ReadCustomerManagement(ReadCustomerRequest) returns (ReadCustomerManagementResponse){// chỉ cần điền localhot+ chuỗi này
+		option (google.api.http) = {
+				get: "/api/CustomerManagement/ReadCustomerManagement/{IdStaff}/{IdCusomer}"
+		};
+	}
 
-//Readlist
-rpc ListCustomerManagement(GetListCustomerManagementRequest) returns (GetListCustomerManagementResponse){}
+	//Readlist
+	rpc ListCustomerManagement(GetListCustomerManagementRequest) returns (GetListCustomerManagementResponse){
+		option (google.api.http) = {
+				get: "/api/CustomerManagement/ListCustomerManagement/{IdStaff}"
+		};
+	}
 
 }
 

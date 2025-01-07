@@ -2,12 +2,15 @@ syntax = "proto3";
 
 option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
 
-
+import "google/api/annotations.proto";
 package LoginManagement;
 
 service LoginManagement{
-	rpc GetLogin(GetLoginRequest) returns (GetLoginResponse){}
-
+	rpc GetLogin(GetLoginRequest) returns (GetLoginResponse){
+		option (google.api.http) = {
+			get: "/api/LoginManagement/GetLogin/{IdStaff}/{Pass}"
+		};
+	};
 }
 
 message GetLoginRequest{

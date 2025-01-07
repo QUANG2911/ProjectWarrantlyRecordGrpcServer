@@ -2,11 +2,17 @@ syntax = "proto3";
 
 option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
 
+import "google/api/annotations.proto";
+
 package WarrantyRecordManagement;
 
 service WarrantyRecordManagement
 {
-	rpc GetListWarrantyRecordManagement(GetWarrantyListRequest) returns (GetWarrantyListResponse){}
+	rpc GetListWarrantyRecordManagement(GetWarrantyListRequest) returns (GetWarrantyListResponse){
+		option (google.api.http) = {
+			get: "/api/WarrantyRecordManagement/GetListWarrantyRecordManagement/{IdStaff}"
+		};
+	}
 }
 
 message GetWarrantyListRequest

@@ -26,7 +26,7 @@ builder.Services.AddScoped<IRepairPart, RepairPartService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IWarranyRecordService, WarrantyRecordService>();
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc().AddJsonTranscoding();
 
 var app = builder.Build();
 
