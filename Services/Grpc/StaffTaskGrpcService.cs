@@ -24,16 +24,16 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-            ItemInsertStaffTaskDto itemInsertStaffTask = new ItemInsertStaffTaskDto
-            {
-                CustomerEmail = request.CustomerEmail,
-                CustomerName = request.CustomerName,
-                CustomerPhone = request.CustomerPhone,
-                DeviceName = request.DeviceName,
-                IdWarrantRecord = request.IdWarrantRecord,
-                ReasonBringFix = request.ReasonBringFix
-            };
-            var result = await _staffTask.CreateNewStaffTask(itemInsertStaffTask);
+            //ItemInsertStaffTaskDto itemInsertStaffTask = new ItemInsertStaffTaskDto
+            //{
+            //    CustomerEmail = request.CustomerEmail,
+            //    CustomerName = request.CustomerName,
+            //    CustomerPhone = request.CustomerPhone,
+            //    DeviceName = request.DeviceName,
+            //    IdWarrantRecord = request.IdWarrantRecord,
+            //    ReasonBringFix = request.ReasonBringFix
+            //};
+            var result = await _staffTask.CreateNewStaffTask(request);
 
             return await Task.FromResult(new CreateRepairManagementResponse { IdTask = result });
         }

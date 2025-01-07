@@ -16,7 +16,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             _context = context;
         }
 
-        public async Task<int> CreateNewStaffTask(ItemInsertStaffTaskDto itemInsertStaffTask)
+        public async Task<int> CreateNewStaffTask(CreateRepairManagementRequest itemInsertStaffTask)
         {
             var checkWarrantlyRecord = _context.WarrantyRecords.FirstOrDefault(x => x.IdWarrantRecord == itemInsertStaffTask.IdWarrantRecord);
 

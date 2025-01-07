@@ -9,9 +9,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
     public class CustomerGrpcService : CustomerManagement.CustomerManagementBase
     {
         private readonly ICustomerService _customerService;
-        private readonly ILogger<StaffTaskGrpcService> _logger;
+        private readonly ILogger<CustomerGrpcService> _logger;
 
-        public CustomerGrpcService(ICustomerService customerService, ILogger<StaffTaskGrpcService> logger)
+        public CustomerGrpcService(ICustomerService customerService, ILogger<CustomerGrpcService> logger)
         {
             _customerService = customerService;
             _logger = logger;
