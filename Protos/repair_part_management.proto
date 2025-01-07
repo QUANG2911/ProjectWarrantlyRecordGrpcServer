@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+
+package RepairPartManagement;
+
+service RepairPartManagement{
+	//Readlist
+	rpc ListRepairPartManagement(GetListRepairPartRequest) returns (GetListRepairPartResponse){}
+
+}
+
+message GetListRepairPartRequest{
+	
+}
+
+message GetRepairPartResponse{
+	int32 IdRepairPart = 1;
+	string RepairPartName = 2;
+	int32 Price = 3;
+}
+
+message GetListRepairPartResponse{
+	repeated GetRepairPartResponse toListRepairPast = 1;
+}

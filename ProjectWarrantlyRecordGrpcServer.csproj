@@ -9,6 +9,9 @@
   <ItemGroup>
 	<Protobuf Include="Protos\repair_management.proto" GrpcServices="Server" />
 	<Protobuf Include="Protos\customer_management.proto" GrpcServices="Server" />
+	<Protobuf Include="Protos\repair_part_management.proto" GrpcServices="Server" />
+	<Protobuf Include="Protos\login.proto" GrpcServices="Server" />
+	<Protobuf Include="Protos\warranty_record_management.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

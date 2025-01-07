@@ -10,7 +10,7 @@ service RepairManagement{
 rpc CreateRepairManagement(CreateRepairManagementRequest) returns (CreateRepairManagementResponse){}
 
 //ReadSingleStaffTasKDDone
-rpc ReadRepairManagement(ReadToRequest) returns (ReadRepairManagementResponse){}
+rpc ReadRepairDone(ReadToRequest) returns (ReadRepairManagementResponse){}
 
 //Readlist
 rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairManagementResponse){}
@@ -18,6 +18,8 @@ rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairM
 //Update
 rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){}
 
+//ReadSingleStaffTaskNotDone
+rpc ReadRepairNotDone(ReadToRequest) returns (ReadItemRepairNotDoneResponse){}
 }
 
 
@@ -74,8 +76,6 @@ message GetListRepairManagementResponse {
   repeated ReadItemRepairManagementResponse toList = 1;
 }
 
-
-
 message UpdateRepairManagementRequest{
 	int32 IdTask = 1;
 }
@@ -84,3 +84,10 @@ message UpdateRepairManagementResponse{
 	int32 IdTask = 1;
 }
 
+message ReadItemRepairNotDoneResponse{
+	int32 IdTask = 1;
+	string CustomerName = 2;
+	string CustomerPhone = 3;
+	int32 StatusTask = 4;
+	string ReasonBringFix = 5;
+}

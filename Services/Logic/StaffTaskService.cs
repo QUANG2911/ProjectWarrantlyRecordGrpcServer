@@ -85,7 +85,38 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
             return response;
 
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Phiếu bảo hành đã hết hạn"));
+        }
+
+        public ReadItemRepairNotDoneResponse GetStaffTaskNotDone(int idStaffTask)
+        {
+            var staffTask = _context.StaffTasks.Where(p => p.IdStaff == idStaffTask).FirstOrDefault();
+            if (staffTask == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu sửa chữa này"));
+            }
+            var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == staffTask.IdWarantyRecord).FirstOrDefault();
+
+            if (warrantyRecord == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu bảo hành này"));
+            }
+            int IdCustomer = warrantyRecord.IdCustomer;
+            var customer = _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
+            if (customer == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Khách hàng này chưa từng mua hàng ở đâu này"));
+            }
+
+            var response = new ReadItemRepairNotDoneResponse
+            {
+                IdTask = staffTask.IdTask,
+                CustomerName = customer.CustomerName,
+                CustomerPhone = customer.CustomerPhone,
+                ReasonBringFix = staffTask.ReasonBringFix,
+                StatusTask = staffTask.StatusTask,
+            };
+          
+            return response;
         }
 
         public void UpdateWorkScheduleAutomatically(int idStaff)
@@ -108,6 +139,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 }    
             }
         }
+
 
         public GetListRepairManagementResponse GetListStaffTask(int idStaff)
         {

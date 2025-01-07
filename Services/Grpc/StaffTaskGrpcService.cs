@@ -4,6 +4,7 @@ using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 using System;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 {
@@ -40,7 +41,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             return await Task.FromResult(response);
         }
 
-        public override async Task<ReadRepairManagementResponse> ReadRepairManagement(ReadToRequest request, ServerCallContext context)
+        public override async Task<ReadRepairManagementResponse> ReadRepairDone(ReadToRequest request, ServerCallContext context)
         {
             if (request.IdTask == 0)
             {
@@ -66,6 +67,16 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             var result = _staffTask.UpdateStaffTask(request.IdTask);
             
             return await Task.FromResult(new UpdateRepairManagementResponse { IdTask = result });
+        }
+
+        public override async Task<ReadItemRepairNotDoneResponse> ReadRepairNotDone(ReadToRequest request, ServerCallContext context)
+        {
+            var response = _staffTask.GetStaffTaskNotDone(request.IdTask);
+            if (response == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin"));
+            }
+            return await Task.FromResult(response);
         }
     }
 }

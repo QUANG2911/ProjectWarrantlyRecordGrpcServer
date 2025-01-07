@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+package WarrantyRecordManagement;
+
+service WarrantyRecordManagement
+{
+	rpc GetListWarrantyRecordManagement(GetWarrantyListRequest) returns (GetWarrantyListResponse){}
+}
+
+message GetWarrantyListRequest
+{
+
+}
+
+message GetWarrantyResponse
+{
+	int32 IdWarrantyRecord = 1;
+	string CustomerName = 2;
+	string DeviceName = 3;
+	string DateOfResig = 4;
+	string TimeEnd = 5;
+	int32 IdCustomer = 6;
+}
+
+message GetWarrantyListResponse
+{
+	repeated GetWarrantyResponse toWarrantyList =  1; 
+}

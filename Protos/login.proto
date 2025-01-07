@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option csharp_namespace = "ProjectWarrantlyRecordGrpcServer.Protos";
+
+
+package LoginManagement;
+
+service LoginManagement{
+	rpc GetLogin(GetLoginRequest) returns (GetLoginResponse){}
+
+}
+
+message GetLoginRequest{
+	int32 IdStaff = 1;
+	string Pass = 2;
+}
+
+message GetLoginResponse{
+	string StaffPosition = 1;
+}
