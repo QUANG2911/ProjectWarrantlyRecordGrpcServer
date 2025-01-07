@@ -16,6 +16,7 @@ rpc ListCustomerManagement(GetListCustomerManagementRequest) returns (GetListCus
 
 message GetListCustomerManagementRequest
 {
+	int32 IdStaff = 1;
 }
 
 message GetItemInListCustomerResponse{
@@ -32,6 +33,7 @@ message GetListCustomerManagementResponse{
 
 message ReadCustomerRequest{
 	int32 IdCusomer = 1;
+	int32 IdStaff = 2;
 }
 
 message ReadItemDeviceCustomerManagementResponse

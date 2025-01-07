@@ -18,7 +18,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
         public override async Task<GetWarrantyListResponse> GetListWarrantyRecordManagement(GetWarrantyListRequest request, ServerCallContext context)
         {
             var response = _warrantyRecordService.GetListWarrantyList();
-            
+            _logger.LogInformation("Thông tin nhân viên truy xuất danh sách phiếu bảo hành IdStaff: {" + request.IdStaff + "} và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
     }

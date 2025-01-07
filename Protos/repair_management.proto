@@ -78,6 +78,7 @@ message GetListRepairManagementResponse {
 
 message UpdateRepairManagementRequest{
 	int32 IdTask = 1;
+	int32 IdStaff = 2;
 }
 
 message UpdateRepairManagementResponse{

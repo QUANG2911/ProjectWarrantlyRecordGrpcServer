@@ -19,11 +19,16 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<GetListCustomerManagementResponse> ListCustomerManagement(GetListCustomerManagementRequest request, ServerCallContext context)
         {
+            if (request.IdStaff == 0)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu mã nhân viên"));
+            }
             var response = _customerService.GetListCustomer();
             if (response.ToCustomerList.Count == 0)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu"));
             }
+            _logger.LogInformation("Thông tin nhân viên truy xuất danh sách khách hàng IdStaff: {" + request.IdStaff + "} và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
 
@@ -33,8 +38,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
+            if (request.IdStaff == 0)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu mã nhân viên"));
+            }
             var response = _customerService.GetDetailCustomer(request.IdCusomer);
-
+            _logger.LogInformation("Thông tin nhân viên truy xuất IdStaff: {" + request.IdStaff + "}truy xuất thông tin khách hàng: {" + request.IdCusomer +"} và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
     }

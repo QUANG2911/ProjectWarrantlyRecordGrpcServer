@@ -11,7 +11,7 @@ service WarrantyRecordManagement
 
 message GetWarrantyListRequest
 {
-
+	int32 IdStaff = 1;
 }
 
 message GetWarrantyResponse

@@ -22,7 +22,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             if (response.ToListRepairPast.Count == 0) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có danh sách linh kiện ??"));
             }
-
+            _logger.LogInformation("Thông tin truy xuất danh sách linh kiện sửa chữa: {" + request + "} và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
     }

@@ -1,15 +1,23 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
-using ProjectWarrantlyRecordGrpcServer.Services;
 using ProjectWarrantlyRecordGrpcServer.Services.Grpc;
 using ProjectWarrantlyRecordGrpcServer.Services.Logic;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // add Builde DB
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// add Serilog -> folder log tự sinh
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Day) //Chọn rolling DAY HAY MINUTE THÌ NÓ SẼ LOADING LOG THEO KIỂU CHỈ ĐỊNH
+    .CreateLogger();
+//Thay thế hệ thống logging mặc định của ASP.NET Core bằng Serilog
+builder.Host.UseSerilog();
 
 // builder services Interface
 builder.Services.AddScoped<IStaffTaskService, StaffTaskService>();

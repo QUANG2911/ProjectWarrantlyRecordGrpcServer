@@ -26,7 +26,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
             var result = await _staffTask.CreateNewStaffTask(request);
-
+            _logger.LogInformation("Thông tin tạo mới phiếu sửa chữa: IdWarrantRecord:{" + request.IdWarrantRecord + "},CustomerPhone:{"+ request.CustomerPhone + "},CustomerEmail{"+ request.CustomerEmail + "},CustomerName {" + request.CustomerName+"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new CreateRepairManagementResponse { IdTask = result });
         }
 
@@ -37,7 +37,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
             var response = _staffTask.GetListStaffTask(request.IdStaff);
-            
+            _logger.LogInformation("Thông tin nhân viên truy cập phiếu sửa chữa: IdStaff:{" + request.IdStaff + "}và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
 
@@ -53,7 +53,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin"));
             }
-
+            _logger.LogInformation("Thông tin truy cập phiếu sửa chữa đã hoàn thành: IdTask:{" + request.IdTask + "}và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
 
         }
@@ -65,7 +65,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
             var result = _staffTask.UpdateStaffTask(request.IdTask);
-            
+            _logger.LogInformation("Thông tin nhân viên cập nhật phiếu sửa chữa: IdStaff:{" + request.IdStaff + "}Thông tin phiếu IdTask:{"+request.IdTask +"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new UpdateRepairManagementResponse { IdTask = result });
         }
 
@@ -76,6 +76,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin"));
             }
+            _logger.LogInformation("Thông tin truy cập phiếu sủa chữa chưa hoàn thành: IdTask:{" + request.IdTask + "}và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }
     }
