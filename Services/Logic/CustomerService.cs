@@ -3,6 +3,7 @@ using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
+using ProjectWarrantlyRecordGrpcServer.Protos;
 using System;
 
 namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
@@ -15,14 +16,25 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         {
             _context = context;
         }
-        public List<Customer> GetListCustomer()
+        public GetListCustomerManagementResponse GetListCustomer()
         {
-            var customer = _context.Customers.ToList();
-
-            return customer;
+            var listCustomer = _context.Customers.ToList();
+            var response = new GetListCustomerManagementResponse();
+            foreach (var item in listCustomer)
+            {
+                response.ToCustomerList.Add(new GetItemInListCustomerResponse
+                {
+                    IdCusomer = item.IdCustomer,
+                    CustomerName = item.CustomerName,
+                    CustomerPhone = item.CustomerPhone,
+                    CustomerEmail = item.CustomerEmail,
+                    CustomerAdrress = item.CustomerAddress
+                });
+            }
+            return response;
         }
 
-        public List<DetailCustomerDto> GetDetailCustomer(int IdCustomer)
+        public ReadCustomerManagementResponse GetDetailCustomer(int IdCustomer)
         {
             var customer = _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
             if (customer == null) {
@@ -39,26 +51,25 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                                            wr.DateOfResig
                                        };
 
+            var response = new ReadCustomerManagementResponse();
 
-            List<DetailCustomerDto> listDetailCustomer = new List<DetailCustomerDto>();
-
-            foreach (var wr in listDeviceOfCustomer)
+            foreach (var item in listDeviceOfCustomer)
             {
-                DetailCustomerDto detailCustomerDto = new DetailCustomerDto 
+                response.ToDeviceList.Add(new ReadItemDeviceCustomerManagementResponse
                 {
                     IdCusomer = customer.IdCustomer,
-                    CustomerName = customer.CustomerName,                    
+                    CustomerName = customer.CustomerName,
                     CustomerEmail = customer.CustomerEmail,
                     CustomerPhone = customer.CustomerPhone,
                     CustomerAdrress = customer.CustomerAddress,
-                    CustomerDevice = wr.DeviceName,
-                    IdWarrantReport = wr.IdWarrantRecord,
-                    DateOfWarrant = wr.DateOfResig,                    
-                    TimeEnd =wr.TimeEnd,                    
-                };
-                listDetailCustomer.Add(detailCustomerDto);
+                    CustomerDevice = item.DeviceName,
+                    IdWarrantReport = item.IdWarrantRecord,
+                    DateOfWarrant = item.DateOfResig.ToString(),
+                    TimeEnd = item.TimeEnd.ToString(),
+                });
             }
-            return listDetailCustomer;
+
+            return response;
         }
     }
 }

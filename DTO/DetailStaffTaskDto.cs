@@ -10,5 +10,8 @@ namespace ProjectWarrantlyRecordGrpcServer.DTO
         public required string CustomerPhone { get; set; }
         public required string ReasonBringFix { get; set; }
         public required int StatusTask { get; set; }
+        public int Price { get; set; }
+        public int Amount { get; set; }
+        public required string RepairPartName { get; set; }
     }
 }

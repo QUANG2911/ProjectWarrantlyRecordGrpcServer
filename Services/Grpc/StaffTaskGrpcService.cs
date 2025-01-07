@@ -24,15 +24,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-            //ItemInsertStaffTaskDto itemInsertStaffTask = new ItemInsertStaffTaskDto
-            //{
-            //    CustomerEmail = request.CustomerEmail,
-            //    CustomerName = request.CustomerName,
-            //    CustomerPhone = request.CustomerPhone,
-            //    DeviceName = request.DeviceName,
-            //    IdWarrantRecord = request.IdWarrantRecord,
-            //    ReasonBringFix = request.ReasonBringFix
-            //};
             var result = await _staffTask.CreateNewStaffTask(request);
 
             return await Task.FromResult(new CreateRepairManagementResponse { IdTask = result });
@@ -44,21 +35,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-            var list = _staffTask.GetListStaffTask(request.IdStaff);
-            var response = new GetListRepairManagementResponse();
-            foreach (var item in list)
-            {
-                response.ToList.Add(new ReadItemRepairManagementResponse
-                {
-                    IdTask = item.IdTask,
-                    CustomerName = item.CustomerName,
-                    CustomerPhone = item.CustomerPhone,
-                    DateOfTask = item.DateOfTask.ToString(),
-                    DateOfWarranty = item.DateOfWarranty.ToString(),
-                    IdWarrantRecord = item.IdWarrantyRecord,
-                    StatusTask = item.StatusTask,
-                });
-            }
+            var response = _staffTask.GetListStaffTask(request.IdStaff);
+            
             return await Task.FromResult(response);
         }
 
@@ -69,20 +47,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
 
-            var staffTask = _staffTask.GetStaffTask(request.IdTask);
-            if (staffTask == null)
+            var response = _staffTask.GetStaffTaskDone(request.IdTask);
+            if (response.ToRepairPartList.Count() == 0)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin"));
             }
 
-            return await Task.FromResult(new ReadRepairManagementResponse
-            {
-                IdTask = staffTask.IdTask,
-                CustomerName = staffTask.CustomerName,
-                CustomerPhone = staffTask.CustomerPhone,
-                StatusTask = staffTask.StatusTask,
-                ReasonBringFix = staffTask.ReasonBringFix,
-            });
+            return await Task.FromResult(response);
+
         }
 
         public override async Task<UpdateRepairManagementResponse> UpdateRepairManagement(UpdateRepairManagementRequest request, ServerCallContext context)

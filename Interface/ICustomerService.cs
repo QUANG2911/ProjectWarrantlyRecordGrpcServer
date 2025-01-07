@@ -1,12 +1,13 @@
 ﻿using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Model;
+using ProjectWarrantlyRecordGrpcServer.Protos;
 
 namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface ICustomerService
     {
-        List<Customer> GetListCustomer();
-        List<DetailCustomerDto> GetDetailCustomer(int IdCustomer);
+        GetListCustomerManagementResponse GetListCustomer();
+        ReadCustomerManagementResponse GetDetailCustomer(int IdCustomer);
 
     }
 }

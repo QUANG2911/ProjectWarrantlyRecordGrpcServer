@@ -19,18 +19,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<GetListCustomerManagementResponse> ListCustomerManagement(GetListCustomerManagementRequest request, ServerCallContext context)
         {
-            var listCustomer = _customerService.GetListCustomer();
-            var response = new GetListCustomerManagementResponse();
-            foreach (var item in listCustomer)
+            var response = _customerService.GetListCustomer();
+            if (response.ToCustomerList.Count == 0)
             {
-                response.ToCustomerList.Add(new GetItemInListCustomerResponse
-                {
-                    IdCusomer = item.IdCustomer,
-                    CustomerName = item.CustomerName,
-                    CustomerPhone = item.CustomerPhone,
-                    CustomerEmail = item.CustomerEmail,
-                    CustomerAdrress = item.CustomerAddress
-                });
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu"));
             }
             return await Task.FromResult(response);
         }
@@ -41,25 +33,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-            var listDetailCustomer = _customerService.GetDetailCustomer(request.IdCusomer);
+            var response = _customerService.GetDetailCustomer(request.IdCusomer);
 
-            var response = new ReadCustomerManagementResponse();
-
-            foreach (var item in listDetailCustomer)
-            {
-                response.ToDeviceList.Add(new ReadItemDeviceCustomerManagementResponse
-                {
-                    IdCusomer = item.IdCusomer,
-                    CustomerName = item.CustomerName,
-                    CustomerEmail = item.CustomerEmail,
-                    CustomerPhone = item.CustomerPhone,
-                    CustomerAdrress = item.CustomerAdrress,
-                    CustomerDevice = item.CustomerDevice,
-                    IdWarrantReport = item.IdWarrantReport,
-                    DateOfWarrant = item.DateOfWarrant.ToString(),
-                    TimeEnd = item.TimeEnd.ToString(),
-                });
-            }
             return await Task.FromResult(response);
         }
     }

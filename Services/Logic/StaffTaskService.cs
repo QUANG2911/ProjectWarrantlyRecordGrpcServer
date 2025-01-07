@@ -5,6 +5,7 @@ using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;
+using System.Collections.Generic;
 
 namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
@@ -48,30 +49,43 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             return result.IdTask;
         }
 
-        public DetailStaffTaskDto GetStaffTask(int idStaffTask)
+        public ReadRepairManagementResponse GetStaffTaskDone(int idStaffTask)
         {
             var listStaffTask = from st in _context.StaffTasks.Where(p => p.IdStaff == idStaffTask)
                                 from wr in _context.WarrantyRecords
                                 from cs in _context.Customers
-                                where st.IdWarantyRecord == wr.IdWarrantRecord && wr.IdCustomer == cs.IdCustomer
+                                from rp in _context.RepairParts
+                                from rd in _context.RepairDetails
+                                where st.IdWarantyRecord == wr.IdWarrantRecord && wr.IdCustomer == cs.IdCustomer && rp.IdRepairPart == rd.IdRepairPart && rd.IdTask == st.IdTask
                                 select new
                                 {
                                     st.IdTask,
                                     cs.CustomerName,
                                     cs.CustomerPhone,
                                     st.ReasonBringFix,
-                                    st.StatusTask
+                                    st.StatusTask,
+                                    rp.RepairPartName,
+                                    rp.Price,
+                                    rd.Amount
                                 };
-
-            DetailStaffTaskDto detailStaffTask = new DetailStaffTaskDto
+            var response = new ReadRepairManagementResponse();
+            foreach (var item in listStaffTask)
             {
-                CustomerName = listStaffTask.First().CustomerName,
-                CustomerPhone = listStaffTask.First().CustomerPhone,
-                IdTask = listStaffTask.First().IdTask,
-                ReasonBringFix = listStaffTask.First().ReasonBringFix,
-                StatusTask = listStaffTask.First().StatusTask,
-            };
-            return detailStaffTask;
+                response.ToRepairPartList.Add(new GetItemRepaitPartInWarrantyReponce
+                {
+                    IdTask = item.IdTask,
+                    CustomerName = item.CustomerName,
+                    CustomerPhone = item.CustomerPhone,
+                    Amount = item.Amount,
+                    Price = item.Price,
+                    RepairPartName = item.RepairPartName,
+                    ReasonBringFix = item.ReasonBringFix,
+                    StatusTask = item.StatusTask,
+                });
+            }
+            return response;
+
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Phiếu bảo hành đã hết hạn"));
         }
 
         public void UpdateWorkScheduleAutomatically(int idStaff)
@@ -95,8 +109,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
         }
 
-        public List<ItemInListStaffTaskDto> GetListStaffTask(int idStaff)
+        public GetListRepairManagementResponse GetListStaffTask(int idStaff)
         {
+
             UpdateWorkScheduleAutomatically(idStaff);
 
             var listStaffTask = from st in _context.StaffTasks.Where(p=>p.IdStaff == idStaff)
@@ -113,30 +128,27 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                                     wr.IdWarrantRecord,
                                     st.StatusTask
                                 };
-            if(listStaffTask == null)
+            if(listStaffTask.Count() == 0)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có danh sách công việc"));
-            }    
-
-            List<ItemInListStaffTaskDto> list = new List<ItemInListStaffTaskDto>();
-
-            foreach (var item in listStaffTask)
-            {
-                ItemInListStaffTaskDto tmp = new ItemInListStaffTaskDto
-                {
-                    CustomerName = item.CustomerName,
-                    CustomerPhone = item.CustomerPhone,
-                    DateOfWarranty = item.DateOfResig,
-                    DateOfTask = item.DateOfResig,
-                    IdTask = item.IdTask,
-                    IdWarrantyRecord = item.IdWarrantRecord,
-                    StatusTask = item.StatusTask
-                };
-
-                list.Add(tmp);
             }
 
-            return list;
+            var response = new GetListRepairManagementResponse();
+            foreach (var item in listStaffTask)
+            {
+                response.ToList.Add(new ReadItemRepairManagementResponse
+                {
+                    IdTask = item.IdTask,
+                    CustomerName = item.CustomerName,
+                    CustomerPhone = item.CustomerPhone,
+                    DateOfTask = item.DateOfTask.ToString(),
+                    DateOfWarranty = item.DateOfResig.ToString(),
+                    IdWarrantRecord = item.IdWarrantRecord,
+                    StatusTask = item.StatusTask,
+                });
+            }
+
+            return response;
         }
 
         public int UpdateStaffTask(int idStaffTask)
