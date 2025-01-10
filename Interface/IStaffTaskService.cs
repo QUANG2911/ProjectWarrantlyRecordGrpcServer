@@ -11,8 +11,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 
         GetListRepairManagementResponse GetListStaffTask(int idStaff);
 
-        ReadItemRepairNotDoneResponse GetStaffTaskNotDone(int idStaffTask);
+        ReadItemCustomerResponse GetStaffTaskCustomer(int idStaffTask);
         void UpdateWorkScheduleAutomatically(int  idStaff);
-        int UpdateStaffTask(int idStaffTask);
+        Task<int> UpdateStaffTask(UpdateRepairManagementRequest idStaffTask);
     }
 }

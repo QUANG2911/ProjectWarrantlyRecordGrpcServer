@@ -57,6 +57,7 @@ message ReadItemDeviceCustomerManagementResponse
 	int32 IdWarrantReport = 7;
 	string DateOfWarrant = 8;
 	string TimeEnd = 9;
+	int32 IdDevice = 10;
 }
 
 message ReadCustomerManagementResponse{

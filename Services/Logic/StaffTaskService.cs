@@ -51,19 +51,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public ReadRepairManagementResponse GetStaffTaskDone(int idStaffTask)
         {
-            var listStaffTask = from st in _context.StaffTasks.Where(p => p.IdStaff == idStaffTask)
-                                from wr in _context.WarrantyRecords
-                                from cs in _context.Customers
-                                from rp in _context.RepairParts
-                                from rd in _context.RepairDetails
-                                where st.IdWarantyRecord == wr.IdWarrantRecord && wr.IdCustomer == cs.IdCustomer && rp.IdRepairPart == rd.IdRepairPart && rd.IdTask == st.IdTask
+            var listStaffTask = from rp in _context.RepairParts
+                                from rd in _context.RepairDetails.Where(p => p.IdTask == idStaffTask)
+                                where  rp.IdRepairPart == rd.IdRepairPart 
                                 select new
                                 {
-                                    st.IdTask,
-                                    cs.CustomerName,
-                                    cs.CustomerPhone,
-                                    st.ReasonBringFix,
-                                    st.StatusTask,
+                                    rp.IdRepairPart,
                                     rp.RepairPartName,
                                     rp.Price,
                                     rd.Amount
@@ -73,23 +66,19 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             {
                 response.ToRepairPartList.Add(new GetItemRepaitPartInWarrantyReponce
                 {
-                    IdTask = item.IdTask,
-                    CustomerName = item.CustomerName,
-                    CustomerPhone = item.CustomerPhone,
+                    IdRepairPart = item.IdRepairPart,
                     Amount = item.Amount,
                     Price = item.Price,
                     RepairPartName = item.RepairPartName,
-                    ReasonBringFix = item.ReasonBringFix,
-                    StatusTask = item.StatusTask,
                 });
             }
             return response;
 
         }
 
-        public ReadItemRepairNotDoneResponse GetStaffTaskNotDone(int idStaffTask)
+        public ReadItemCustomerResponse GetStaffTaskCustomer(int idTask)
         {
-            var staffTask = _context.StaffTasks.Where(p => p.IdStaff == idStaffTask).FirstOrDefault();
+            var staffTask = _context.StaffTasks.Where(p => p.IdTask == idTask).FirstOrDefault();
             if (staffTask == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu sửa chữa này"));
@@ -107,7 +96,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Khách hàng này chưa từng mua hàng ở đâu này"));
             }
 
-            var response = new ReadItemRepairNotDoneResponse
+            var response = new ReadItemCustomerResponse
             {
                 IdTask = staffTask.IdTask,
                 CustomerName = customer.CustomerName,
@@ -183,22 +172,60 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             return response;
         }
 
-        public int UpdateStaffTask(int idStaffTask)
+        public async Task<int> UpdateStaffTask(UpdateRepairManagementRequest request )
         {
-            var staffTask = _context.StaffTasks.Find(idStaffTask);
 
+            var staffTask = _context.StaffTasks.Find(request.IdTask);
+            int total = 0;
             if (staffTask == null) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có công việc này"));
             }
-            staffTask.StatusTask = 1;
 
-            var staff = _context.Staffs.Find(staffTask.IdStaff);
+            var staff = _context.Staffs.Find(request.IdStaff);
             if (staff == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có nhân viên này ??? sao gán được dữ liệu hay vậy"));
             }
+
+            staffTask.StatusTask = request.StatusTask;
             staff.Status = 0;
-            _context.SaveChanges();
+            if( request.ToListUpdateRepairPart.Count > 0)
+            {
+                foreach( var item in request.ToListUpdateRepairPart )
+                {
+                    RepairDetail repairDetail = new RepairDetail();
+                    repairDetail.IdTask = request.IdTask;
+                    repairDetail.IdRepairPart = item.IdRepairPart;
+                    repairDetail.Amount = item.Amount;
+
+                    await _context.RepairDetails.AddAsync(repairDetail);
+                    total = total + item.Amount*item.Price;
+                }    
+            }
+
+            if(request.StatusTask == 1)
+            {
+                Bill bill = new Bill
+                {
+                    IdBill = 1,
+                    IdTask = request.IdTask,
+                    TotalAmount = total,
+                    DateCreateBill = DateOnly.FromDateTime(DateTime.Now),
+                    StatusBill = 0,
+                };
+                 await _context.Bills.AddAsync(bill);     
+            }
+            await _context.SaveChangesAsync();
+
+    //      catch (DbUpdateException dbEx)
+    //      {
+    //            throw new RpcException(new Status(StatusCode.Internal, $"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}"));
+    //      }
+    //      catch (RpcException rpcEx)
+    //      {
+    //           throw rpcEx; // Giữ nguyên lỗi RPC đã được định nghĩa.
+    //      }
+
             return staffTask.IdTask;
         }
     }

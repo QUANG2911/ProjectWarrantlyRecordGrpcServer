@@ -64,14 +64,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-            var result = _staffTask.UpdateStaffTask(request.IdTask);
+             var result = await _staffTask.UpdateStaffTask(request);
             _logger.LogInformation("Thông tin nhân viên cập nhật phiếu sửa chữa: IdStaff:{" + request.IdStaff + "}Thông tin phiếu IdTask:{"+request.IdTask +"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new UpdateRepairManagementResponse { IdTask = result });
         }
 
-        public override async Task<ReadItemRepairNotDoneResponse> ReadRepairNotDone(ReadToRequest request, ServerCallContext context)
+        public override async Task<ReadItemCustomerResponse> ReadRepairCustomer (ReadToRequest request, ServerCallContext context)
         {
-            var response = _staffTask.GetStaffTaskNotDone(request.IdTask);
+            var response = _staffTask.GetStaffTaskCustomer(request.IdTask);
             if (response == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin"));

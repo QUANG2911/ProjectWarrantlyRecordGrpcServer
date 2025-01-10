@@ -48,7 +48,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                                            dc.DeviceName,
                                            wr.IdWarrantRecord,
                                            wr.TimeEnd,
-                                           wr.DateOfResig
+                                           wr.DateOfResig,
+                                           dc.IdDevice
                                        };
 
             var response = new ReadCustomerManagementResponse();
@@ -66,6 +67,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     IdWarrantReport = item.IdWarrantRecord,
                     DateOfWarrant = item.DateOfResig.ToString(),
                     TimeEnd = item.TimeEnd.ToString(),
+                    IdDevice = item.IdDevice,
                 });
             }
 

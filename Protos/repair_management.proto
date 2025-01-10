@@ -23,20 +23,32 @@ service RepairManagement{
 		};
 	}
 
-	//Readlist
+//ReadSingleStaffTaskNotDone
+	/*
+	rpc ReadRepairNotDone(ReadToRequest) returns (ReadItemRepairNotDoneResponse){
+		option (google.api.http) = {
+				get: "/api/RepairManagement/ReadRepairNotDone/{IdTask}"
+		};
+	}
+	*/
+//ReadSingleStaffCustomer
+	rpc ReadRepairCustomer(ReadToRequest) returns (ReadItemCustomerResponse){
+		option (google.api.http) = {
+				get: "/api/RepairManagement/ReadRepairCustomer/{IdTask}"
+		};
+	}
+//Readlist
 	rpc ListRepairManagement(GetListRepairManagementRequest) returns (GetListRepairManagementResponse){
 		option (google.api.http) = {
 				get: "/api/RepairManagement/ListRepairManagement/{IdStaff}"
 		};
 	}
 
-	//Update
-	rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){}
-
-	//ReadSingleStaffTaskNotDone
-	rpc ReadRepairNotDone(ReadToRequest) returns (ReadItemRepairNotDoneResponse){
+//Update
+	rpc UpdateRepairManagement(UpdateRepairManagementRequest) returns (UpdateRepairManagementResponse){
 		option (google.api.http) = {
-				get: "/api/RepairManagement/ReadRepairNotDone/{IdTask}"
+			put:  "/api/RepairManagement/UpdateRepairManagement/{IdStaff}/{IdTask}/{StatusTask}", 
+			body: "*"
 		};
 	}
 }
@@ -49,6 +61,7 @@ message CreateRepairManagementRequest{
 	string DeviceName = 4;
 	int32 IdWarrantRecord = 5;
 	string ReasonBringFix = 6;
+	string CustomerAddress = 7;
 }
 
 message CreateRepairManagementResponse{
@@ -61,14 +74,10 @@ message ReadToRequest{
 }
 
 message GetItemRepaitPartInWarrantyReponce{
-	int32 IdTask = 1;
-	string CustomerName = 2;
-	string CustomerPhone = 3;
-	int32 StatusTask = 4;
-	string ReasonBringFix = 5;
-	string RepairPartName = 6;
-	int32 Price = 7;
-	int32 Amount = 8;
+	int32 IdRepairPart = 1;
+	string RepairPartName = 2;
+	int32 Price = 3;
+	int32 Amount = 4;
 }
 
 message ReadRepairManagementResponse{
@@ -95,16 +104,24 @@ message GetListRepairManagementResponse {
   repeated ReadItemRepairManagementResponse toList = 1;
 }
 
+message UpdateItemRepairPart
+{
+	int32 IdRepairPart = 1;
+	int32 Amount = 2;
+	int32 Price = 3;
+}
 message UpdateRepairManagementRequest{
 	int32 IdTask = 1;
 	int32 IdStaff = 2;
+	int32 StatusTask = 3;
+	repeated UpdateItemRepairPart toListUpdateRepairPart = 4;
 }
 
 message UpdateRepairManagementResponse{
 	int32 IdTask = 1;
 }
 
-message ReadItemRepairNotDoneResponse{
+message ReadItemCustomerResponse{
 	int32 IdTask = 1;
 	string CustomerName = 2;
 	string CustomerPhone = 3;

@@ -28,7 +28,54 @@ builder.Services.AddScoped<IWarranyRecordService, WarrantyRecordService>();
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
 
+
+// Cấu hình kết nối angular
+//session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true; // Chỉ cho phép truy cập qua HTTP
+    options.Cookie.IsEssential = true; // Cookie cần thiết cho session
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Chỉ gửi cookie qua HTTPS
+});
+builder.Services.AddMemoryCache();
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession();
+
+// CORS configuration
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .WithExposedHeaders("Authorization", "Cache-Control", "Content-Type"); // Tùy chọn: Cho phép các headers này xuất hiện trong response
+    });
+});
+
+
 var app = builder.Build();
+
+// app Cấu hình kết nối angular
+//app.UseCors("AllowAngularApp");
+
+app.UseCors("AllowAllOrigins");
+app.UseSession();
+// cho phép quyền hạn để truy cập -- khai báo thêm bên controller
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == HttpMethods.Options)
+    {
+        context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+        context.Response.Headers.Append("Access-Control-Allow-Headers", "Authorization, Content-Type, Cache-Control");
+        context.Response.StatusCode = 200;
+        return;
+    }
+    await next();
+});
+//////
 
 // Configure the HTTP request pipeline.
 
@@ -40,3 +87,17 @@ app.MapGrpcService<WarrantyRecordGrpcService>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
+
+
+
+// Middleware để xử lý Preflight Request (OPTIONS)
+app.UseAuthorization();
+app.MapControllers();
