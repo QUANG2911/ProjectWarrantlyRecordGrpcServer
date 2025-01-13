@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using ProjectWarrantlyRecordGrpcServer.Data;
-using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;

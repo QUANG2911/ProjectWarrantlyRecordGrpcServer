@@ -1,6 +1,5 @@
 ﻿using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
-using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 using System;

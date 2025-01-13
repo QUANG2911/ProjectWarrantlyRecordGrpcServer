@@ -1,4 +1,4 @@
-﻿using ProjectWarrantlyRecordGrpcServer.DTO;
+﻿
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 

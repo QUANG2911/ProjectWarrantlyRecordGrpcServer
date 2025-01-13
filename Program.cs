@@ -25,6 +25,7 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IRepairPart, RepairPartService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IWarranyRecordService, WarrantyRecordService>();
+builder.Services.AddScoped<IMailSevice, EmailSevice>();
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
 

@@ -1,7 +1,6 @@
 ﻿using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using ProjectWarrantlyRecordGrpcServer.Data;
-using ProjectWarrantlyRecordGrpcServer.DTO;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;
@@ -12,10 +11,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
     public class StaffTaskService : IStaffTaskService
     {
         private readonly ApplicationDbContext _context;
-        public StaffTaskService(ApplicationDbContext context)
+        private readonly IMailSevice _mail;
+        public StaffTaskService(ApplicationDbContext context, IMailSevice mail)
         {
             _context = context;
+            _mail = mail;
         }
+
+
 
         public async Task<int> CreateNewStaffTask(CreateRepairManagementRequest itemInsertStaffTask)
         {
@@ -29,7 +32,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Phiếu bảo hành đã hết hạn"));
             }
-           
+
+            int idTask = _context.StaffTasks.Count() + 1;
+
             var staffTask = new StaffTask
             {
                 IdWarantyRecord = itemInsertStaffTask.IdWarrantRecord,
@@ -40,11 +45,18 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             await _context.StaffTasks.AddAsync(staffTask);
             _context.SaveChanges();
 
-            var result = _context.StaffTasks.OrderByDescending(p => p.IdStaff).FirstOrDefault();
+            var result = _context.StaffTasks.Where(p =>p.IdTask == idTask).FirstOrDefault();
 
             if (result == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi add dữ liệu"));
+            }    
+
+            var checkMail = _mail.SendEmailAsync(itemInsertStaffTask.CustomerName, idTask, itemInsertStaffTask.IdWarrantRecord, itemInsertStaffTask.CustomerEmail, "Xác nhận đăng ký phiếu sửa chữa thành công", "RegistrationTask",itemInsertStaffTask.ReasonBringFix,"","",0);
+
+            if(checkMail != "done")
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "gửi mail bị lỗi"));
             }
             return result.IdTask;
         }
@@ -118,14 +130,24 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
             if (checkStatusStaff.Status == 0)
             {
-                var stafTask = _context.StaffTasks.Where(p=>p.IdStaff == null).OrderByDescending(p=>p.DateOfTask).FirstOrDefault();
-                if(stafTask != null)
+                var stafTask = _context.StaffTasks.Where(p => p.IdStaff == null).OrderByDescending(p => p.DateOfTask).FirstOrDefault();
+                if (stafTask != null)
                 {
                     stafTask.IdStaff = idStaff;
                     stafTask.StatusTask = 0;
                     checkStatusStaff.Status = 1;
                     _context.SaveChanges();
-                }    
+
+                    var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == stafTask.IdTask).FirstOrDefault();
+                    if (warrantyRecord != null)
+                    {
+                        var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
+                        if (customer != null)
+                        {
+                            var checkMail = _mail.SendEmailAsync(customer.CustomerName,stafTask.IdTask, warrantyRecord.IdWarrantRecord, "buiminhquangquang8@gmail.com", "Xác nhận tiếp nhận phiếu sửa chữa của quý khách", "ReceiptTask", "", checkStatusStaff.StaffName,"",0);
+                        }
+                    }                    
+                }
             }
         }
 
@@ -202,29 +224,45 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     total = total + item.Amount*item.Price;
                 }    
             }
+            var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == request.IdTask).FirstOrDefault();
+            if (warrantyRecord == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu bảo hành này ??? sao gán được dữ liệu hay vậy"));
+            }
+            var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
+            if (customer == null)
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có khách hàng này ??? sao gán được dữ liệu hay vậy"));
+            }
 
-            if(request.StatusTask == 1)
+            if (request.StatusTask == 1)
             {
                 Bill bill = new Bill
                 {
-                    IdBill = 1,
                     IdTask = request.IdTask,
                     TotalAmount = total,
                     DateCreateBill = DateOnly.FromDateTime(DateTime.Now),
                     StatusBill = 0,
                 };
-                 await _context.Bills.AddAsync(bill);     
+                await _context.Bills.AddAsync(bill);
+                var checkMail = _mail.SendEmailWithTable(customer.CustomerName, "Xác nhận tiếp nhận phiếu sửa chữa của quý khách", "buiminhquangquang8@gmail.com", request.IdTask, warrantyRecord.IdWarrantRecord, DateTime.Now.ToString("dd/MM/yyyy"), total, request);
+            }
+            else if (request.StatusTask == 2) 
+            {
+                var checkMail = _mail.SendEmailAsync(customer.CustomerName, request.IdTask, warrantyRecord.IdWarrantRecord, "buiminhquangquang8@gmail.com", "Thông báo hủy bỏ đơn sửa chữa và bảo hành", "RejectTask", "", "", "", 0);
             }
             await _context.SaveChangesAsync();
 
-    //      catch (DbUpdateException dbEx)
-    //      {
-    //            throw new RpcException(new Status(StatusCode.Internal, $"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}"));
-    //      }
-    //      catch (RpcException rpcEx)
-    //      {
-    //           throw rpcEx; // Giữ nguyên lỗi RPC đã được định nghĩa.
-    //      }
+           
+
+            //      catch (DbUpdateException dbEx)
+            //      {
+            //            throw new RpcException(new Status(StatusCode.Internal, $"Database error: {dbEx.InnerException?.Message ?? dbEx.Message}"));
+            //      }
+            //      catch (RpcException rpcEx)
+            //      {
+            //           throw rpcEx; // Giữ nguyên lỗi RPC đã được định nghĩa.
+            //      }
 
             return staffTask.IdTask;
         }

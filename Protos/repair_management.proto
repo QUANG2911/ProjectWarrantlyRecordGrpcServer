@@ -107,8 +107,9 @@ message GetListRepairManagementResponse {
 message UpdateItemRepairPart
 {
 	int32 IdRepairPart = 1;
-	int32 Amount = 2;
-	int32 Price = 3;
+	string RepairPartName = 2;
+	int32 Amount = 3;
+	int32 Price = 4;
 }
 message UpdateRepairManagementRequest{
 	int32 IdTask = 1;
