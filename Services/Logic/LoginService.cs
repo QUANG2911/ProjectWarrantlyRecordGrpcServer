@@ -29,7 +29,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         public string GetToken(int idStaff)
         {
             var secretKey = "ThisIsA32CharLongSecretKey12345_123_344_122";
-
+            
             // Tạo JWT token
             var claims = new List<Claim> // mã xác thực sau này
             {
@@ -42,7 +42,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             var token = new JwtSecurityToken(
                 issuer: "https://localhost:7059",
                 audience: "https://localhost:7059",
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddDays(1), // set timeLife ở đây để qua kia set exp
                 claims: claims,
                 signingCredentials: creds);
 

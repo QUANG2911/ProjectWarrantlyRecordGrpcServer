@@ -19,18 +19,25 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             //lấy list chuyền từ schema
             var token = handler.ReadJwtToken(authHeader.Value.Replace("Bearer ", ""));
 
-            //dùng khi kiểm tra postman
-            ////tách lấy mỗi chuỗi token chuyền qua
-            //var tokenString = token.Header.FirstOrDefault().Value;
-            ////đọc chuỗi token trên mã JWT
-            //var AccessToken = handler.ReadJwtToken(tokenString.ToString());
 
             var idStaffFromToken = token.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+            var timeLife = token.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+
 
             if (idStaffFromToken == null || idStaffFromToken != idStaff.ToString())
             {
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Mã nhân viên này không thể sở hữu được token này"));
             }
+            if (timeLife == null)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Không có timelife của token"));
+            }    
+            int timeNum = int.Parse(timeLife);
+            int dateNow = (int)((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+            if (timeNum <= dateNow)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Token hết hạn out"));
+            }    
 
             return "done";
         }

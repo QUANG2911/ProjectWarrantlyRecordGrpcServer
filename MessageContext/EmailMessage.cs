@@ -196,7 +196,7 @@ namespace ProjectWarrantlyRecordGrpcServer.MessageContext
                         <html>
                         <head>
                             <style>
-                                vertical-header-table {{
+                                .vertical-header-table {{
                                       width: 50%; /* Tùy chỉnh kích thước bảng */
                                       border-collapse: collapse;
                                       margin: 20px 0;
