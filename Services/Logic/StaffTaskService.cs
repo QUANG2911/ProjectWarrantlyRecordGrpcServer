@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
+using ProjectWarrantlyRecordGrpcServer.MessageContext;
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
@@ -17,8 +19,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             _context = context;
             _mail = mail;
         }
-
-
 
         public async Task<int> CreateNewStaffTask(CreateRepairManagementRequest itemInsertStaffTask)
         {
@@ -50,9 +50,18 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             if (result == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi add dữ liệu"));
-            }    
-
-            var checkMail = _mail.SendEmailAsync(itemInsertStaffTask.CustomerName, idTask, itemInsertStaffTask.IdWarrantRecord, itemInsertStaffTask.CustomerEmail, "Xác nhận đăng ký phiếu sửa chữa thành công", "RegistrationTask",itemInsertStaffTask.ReasonBringFix,"","",0);
+            }
+            var checkMail = _mail.SendEmailAsync(
+                new NotificationParameters
+                {
+                    CustomerName = itemInsertStaffTask.CustomerName,
+                    IdTask = idTask,
+                    IdWarrantyRecord = itemInsertStaffTask.IdWarrantRecord,
+                    CustomerEmail = itemInsertStaffTask.CustomerEmail,
+                    subject = "Xác nhận đăng ký phiếu sửa chữa thành công",
+                    TypeMessage = "RegistrationTask",
+                    ReasonBringFix = itemInsertStaffTask.ReasonBringFix
+                }, 0);
 
             if(checkMail != "done")
             {
@@ -144,7 +153,17 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                         var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
                         if (customer != null)
                         {
-                            var checkMail = _mail.SendEmailAsync(customer.CustomerName,stafTask.IdTask, warrantyRecord.IdWarrantRecord, "buiminhquangquang8@gmail.com", "Xác nhận tiếp nhận phiếu sửa chữa của quý khách", "ReceiptTask", "", checkStatusStaff.StaffName,"",0);
+                            var checkMail = _mail.SendEmailAsync(
+                            new NotificationParameters
+                            {
+                                CustomerName = customer.CustomerName,
+                                IdTask = stafTask.IdTask,
+                                IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                                CustomerEmail = customer.CustomerEmail,
+                                subject = "Thông báo xác nhận tiếp nhận phiếu sửa chữa của quý khách",
+                                TypeMessage = "ReceiptTask",
+                                StaffName =checkStatusStaff.StaffName,
+                            }, 0);
                         }
                     }                    
                 }
@@ -245,13 +264,35 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     StatusBill = 0,
                 };
                 await _context.Bills.AddAsync(bill);
-                var checkMail = _mail.SendEmailWithTable(customer.CustomerName, "Xác nhận tiếp nhận phiếu sửa chữa của quý khách", "buiminhquangquang8@gmail.com", request.IdTask, warrantyRecord.IdWarrantRecord, DateTime.Now.ToString("dd/MM/yyyy"), total, request);
+                var checkMail = _mail.SendEmailAsync(
+                            new NotificationParameters
+                            {
+                                CustomerName = customer.CustomerName,
+                                IdTask = request.IdTask,
+                                IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                                CustomerEmail = customer.CustomerEmail,
+                                subject = "Thông báo xác nhận xử lý phiếu sửa chữa của quý khách",
+                                TypeMessage = "Bill",
+                                DateBill = DateTime.Now.ToString("dd/MM/yyyy"),
+                                TotalBill = total,
+                                listRepairParts = request
+                            }, 1);
+        
             }
             else if (request.StatusTask == 2) 
             {
-                var checkMail = _mail.SendEmailAsync(customer.CustomerName, request.IdTask, warrantyRecord.IdWarrantRecord, "buiminhquangquang8@gmail.com", "Thông báo hủy bỏ đơn sửa chữa và bảo hành", "RejectTask", "", "", "", 0);
+                var checkMail = _mail.SendEmailAsync(
+                           new NotificationParameters
+                           {
+                               CustomerName = customer.CustomerName,
+                               IdTask = request.IdTask,
+                               IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                               CustomerEmail = customer.CustomerEmail,
+                               subject = "Thông báo hủy bỏ đơn sửa chữa và bảo hành",
+                               TypeMessage = "RejectTask",
+                           }, 0);
             }
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
            
 
