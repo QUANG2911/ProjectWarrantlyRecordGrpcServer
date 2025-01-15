@@ -20,4 +20,5 @@ message GetLoginRequest{
 
 message GetLoginResponse{
 	string StaffPosition = 1;
+	string token = 2;
 }

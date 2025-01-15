@@ -251,7 +251,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             {
                 var checkMail = _mail.SendEmailAsync(customer.CustomerName, request.IdTask, warrantyRecord.IdWarrantRecord, "buiminhquangquang8@gmail.com", "Thông báo hủy bỏ đơn sửa chữa và bảo hành", "RejectTask", "", "", "", 0);
             }
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
            
 

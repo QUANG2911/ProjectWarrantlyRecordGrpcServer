@@ -3,25 +3,30 @@ using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 {
     public class CustomerGrpcService : CustomerManagement.CustomerManagementBase
     {
         private readonly ICustomerService _customerService;
+        private readonly ITokenService _tokenService;
         private readonly ILogger<CustomerGrpcService> _logger;
 
-        public CustomerGrpcService(ICustomerService customerService, ILogger<CustomerGrpcService> logger)
+        public CustomerGrpcService(ICustomerService customerService,ITokenService tokenService, ILogger<CustomerGrpcService> logger)
         {
             _customerService = customerService;
             _logger = logger;
+            _tokenService = tokenService;
         }
 
         public override async Task<GetListCustomerManagementResponse> ListCustomerManagement(GetListCustomerManagementRequest request, ServerCallContext context)
         {
-            if (request.IdStaff == 0)
+            var checkToken = _tokenService.CheckTokenIdStaff(request.IdStaff, context);
+
+            if (checkToken != "done")
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu mã nhân viên"));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi thông tin token nhận được"));
             }
             var response = _customerService.GetListCustomer();
             if (response.ToCustomerList.Count == 0)
@@ -34,13 +39,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<ReadCustomerManagementResponse> ReadCustomerManagement(ReadCustomerRequest request, ServerCallContext context)
         {
-            if(request.IdCusomer == 0)
+            var checkToken = _tokenService.CheckTokenIdStaff(request.IdStaff, context);
+            if (request.IdCusomer == 0)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
-            }
-            if (request.IdStaff == 0)
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có dữ liệu mã nhân viên"));
             }
             var response = _customerService.GetDetailCustomer(request.IdCusomer);
             _logger.LogInformation("Thông tin nhân viên truy xuất IdStaff: {" + request.IdStaff + "}truy xuất thông tin khách hàng: {" + request.IdCusomer +"} và kết quả trả ra là response:{" + response + "}");

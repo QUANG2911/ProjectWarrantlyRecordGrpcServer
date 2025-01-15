@@ -1,9 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Services.Grpc;
 using ProjectWarrantlyRecordGrpcServer.Services.Logic;
 using Serilog;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,7 @@ builder.Services.AddScoped<IRepairPart, RepairPartService>();
 builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IWarranyRecordService, WarrantyRecordService>();
 builder.Services.AddScoped<IMailSevice, EmailSevice>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
 
@@ -77,6 +81,8 @@ app.Use(async (context, next) =>
     await next();
 });
 //////
+
+
 
 // Configure the HTTP request pipeline.
 

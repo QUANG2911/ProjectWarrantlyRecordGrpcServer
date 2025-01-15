@@ -11,11 +11,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
     {
         private readonly IStaffTaskService _staffTask;
         private readonly ILogger<StaffTaskGrpcService> _logger;
-
-        public StaffTaskGrpcService(IStaffTaskService staffTask, ILogger<StaffTaskGrpcService> logger)
+        private readonly ITokenService _tokenService;
+        public StaffTaskGrpcService(IStaffTaskService staffTask, ILogger<StaffTaskGrpcService> logger, ITokenService tokenService)
         {
             _staffTask = staffTask;
             _logger = logger;
+            _tokenService = tokenService;
         }
 
         public override async Task<CreateRepairManagementResponse> CreateRepairManagement(CreateRepairManagementRequest request, ServerCallContext context)
@@ -24,6 +25,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
+
             var result = await _staffTask.CreateNewStaffTask(request);
             _logger.LogInformation("Thông tin tạo mới phiếu sửa chữa: IdWarrantRecord:{" + request.IdWarrantRecord + "},CustomerPhone:{"+ request.CustomerPhone + "},CustomerEmail{"+ request.CustomerEmail + "},CustomerName {" + request.CustomerName+"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new CreateRepairManagementResponse { IdTask = result });
@@ -31,9 +33,11 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<GetListRepairManagementResponse> ListRepairManagement(GetListRepairManagementRequest request, ServerCallContext context)
         {
-            if (request.IdStaff == 0)
+            var checkToken = _tokenService.CheckTokenIdStaff(request.IdStaff, context);
+
+            if (checkToken != "done")
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi thông tin token nhận được"));
             }
             var response = _staffTask.GetListStaffTask(request.IdStaff);
             _logger.LogInformation("Thông tin nhân viên truy cập phiếu sửa chữa: IdStaff:{" + request.IdStaff + "}và kết quả trả ra là response:{" + response + "}");
@@ -41,7 +45,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
         }
 
         public override async Task<ReadRepairManagementResponse> ReadRepairDone(ReadToRequest request, ServerCallContext context)
-        {
+        {            
             if (request.IdTask == 0)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
@@ -63,7 +67,13 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
-             var result = await _staffTask.UpdateStaffTask(request);
+            var checkToken = _tokenService.CheckTokenIdStaff(request.IdStaff, context);
+
+            if (checkToken != "done")
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi thông tin token nhận được"));
+            }
+            var result = await _staffTask.UpdateStaffTask(request);
             _logger.LogInformation("Thông tin nhân viên cập nhật phiếu sửa chữa: IdStaff:{" + request.IdStaff + "}Thông tin phiếu IdTask:{"+request.IdTask +"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new UpdateRepairManagementResponse { IdTask = result });
         }
