@@ -90,7 +90,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     <td>{item.Price}</td>
                 </tr>");
             }
-
+            //test
             string formattedTotalBill = totalBill.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"));
 
 
