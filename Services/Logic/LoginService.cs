@@ -25,30 +25,5 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
             return staff.StaffPosition;
         }
-
-        public string GetToken(int idStaff)
-        {
-            var secretKey = "ThisIsA32CharLongSecretKey12345_123_344_122";
-            
-            // Tạo JWT token
-            var claims = new List<Claim> // mã xác thực sau này
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, idStaff.ToString()),
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "https://localhost:7059",
-                audience: "https://localhost:7059",
-                expires: DateTime.UtcNow.AddDays(1), // set timeLife ở đây để qua kia set exp
-                claims: claims,
-                signingCredentials: creds);
-
-            string jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
     }
 }

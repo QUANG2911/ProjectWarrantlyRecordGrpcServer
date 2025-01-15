@@ -9,11 +9,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
     {
         private readonly ILoginService _loginService;
         private readonly ILogger<LoginGrpcService> _logger;
-
-        public LoginGrpcService(ILoginService loginService, ILogger<LoginGrpcService> logger)
+        private readonly ITokenService _tokenService;
+        public LoginGrpcService(ILoginService loginService, ILogger<LoginGrpcService> logger, ITokenService tokenService)
         {
             _logger = logger;
             _loginService = loginService;
+            _tokenService = tokenService;
         }
 
         public override async Task<GetLoginResponse> GetLogin(GetLoginRequest request, ServerCallContext context)
@@ -27,7 +28,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin tài khoản nhân viên này"));
             }
-            var token = _loginService.GetToken(request.IdStaff);
+            var token = _tokenService.GetToken(request.IdStaff);
             if (token == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi tạo token"));
