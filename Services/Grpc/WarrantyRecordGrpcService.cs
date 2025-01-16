@@ -18,12 +18,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<GetWarrantyListResponse> GetListWarrantyRecordManagement(GetWarrantyListRequest request, ServerCallContext context)
         {
-            var checkToken = _tokenService.CheckTokenIdStaff(request.IdStaff, context);
+            var checkToken =  await _tokenService.CheckTokenIdStaff(request.IdStaff, context);
             if (checkToken != "done")
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi thông tin token nhận được"));
             }
-            var response = _warrantyRecordService.GetListWarrantyList();
+            var response = await _warrantyRecordService.GetListWarrantyList();
             _logger.LogInformation("Thông tin nhân viên truy xuất danh sách phiếu bảo hành IdStaff: {" + request.IdStaff + "} và kết quả trả ra là response:{" + response + "}");
             return await Task.FromResult(response);
         }

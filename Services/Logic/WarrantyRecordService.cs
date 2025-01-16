@@ -14,7 +14,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             _context = context;
         }
 
-        public GetWarrantyListResponse GetListWarrantyList()
+        public async Task<GetWarrantyListResponse> GetListWarrantyList()
         {
             var listWarrantyRecord = from wr in _context.WarrantyRecords
                                      from cs in _context.Customers
@@ -46,7 +46,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     IdWarrantyRecord = item.IdWarrantRecord
                 });
             }
-            return response;
+            return await Task.FromResult(response);
         }
     }
 }

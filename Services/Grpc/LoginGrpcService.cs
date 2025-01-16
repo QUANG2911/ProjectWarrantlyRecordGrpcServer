@@ -23,12 +23,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Vui lòng điền đầy đủ thông tin đăng nhập"));
             }    
-            var response = _loginService.GetLogin(request.IdStaff, request.Pass);
+            var response = await _loginService.GetLogin(request.IdStaff, request.Pass);
             if (response == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin tài khoản nhân viên này"));
             }
-            var token = _tokenService.GetToken(request.IdStaff);
+            var token = await _tokenService.GetToken(request.IdStaff);
             if (token == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi tạo token"));

@@ -4,8 +4,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface ITokenService
     {
-        string CheckTokenIdStaff(int idStaff, ServerCallContext context);
+        Task<string> CheckTokenIdStaff(int idStaff, ServerCallContext context);
 
-        string GetToken(int idStaff);
+        Task<string> GetToken(int idStaff);
     }
 }

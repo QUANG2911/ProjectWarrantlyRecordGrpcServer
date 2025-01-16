@@ -51,7 +51,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Lỗi add dữ liệu"));
             }
-            var checkMail = _mail.SendEmailAsync(
+            var checkMail = await _mail.SendEmailAsync(
                 new NotificationParameters
                 {
                     CustomerName = itemInsertStaffTask.CustomerName,
@@ -70,7 +70,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             return result.IdTask;
         }
 
-        public ReadRepairManagementResponse GetStaffTaskDone(int idStaffTask)
+        public async Task<ReadRepairManagementResponse> GetStaffTaskDone(int idStaffTask)
         {
             var listStaffTask = from rp in _context.RepairParts
                                 from rd in _context.RepairDetails.Where(p => p.IdTask == idStaffTask)
@@ -93,11 +93,11 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     RepairPartName = item.RepairPartName,
                 });
             }
-            return response;
+            return await Task.FromResult(response);
 
         }
 
-        public ReadItemCustomerResponse GetStaffTaskCustomer(int idTask)
+        public async Task<ReadItemCustomerResponse> GetStaffTaskCustomer(int idTask)
         {
             var staffTask = _context.StaffTasks.Where(p => p.IdTask == idTask).FirstOrDefault();
             if (staffTask == null)
@@ -126,10 +126,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 StatusTask = staffTask.StatusTask,
             };
           
-            return response;
+            return await Task.FromResult(response);
         }
 
-        public void UpdateWorkScheduleAutomatically(int idStaff)
+        public async Task<string> UpdateWorkScheduleAutomatically(int idStaff)
         {
             var checkStatusStaff = _context.Staffs.Where(p=>p.IdStaff == idStaff).FirstOrDefault();
 
@@ -153,7 +153,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                         var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
                         if (customer != null)
                         {
-                            var checkMail = _mail.SendEmailAsync(
+                            var checkMail = await _mail.SendEmailAsync(
                             new NotificationParameters
                             {
                                 CustomerName = customer.CustomerName,
@@ -168,13 +168,19 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     }                    
                 }
             }
+
+            return await Task.FromResult("done");
         }
 
 
-        public GetListRepairManagementResponse GetListStaffTask(int idStaff)
+        public async Task<GetListRepairManagementResponse> GetListStaffTask(int idStaff)
         {
 
-            UpdateWorkScheduleAutomatically(idStaff);
+            var checkDoneUpdateTask = await UpdateWorkScheduleAutomatically(idStaff);
+            if (checkDoneUpdateTask != "done")
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Chưa qua cập nhật tự động"));
+            }
 
             var listStaffTask = from st in _context.StaffTasks.Where(p=>p.IdStaff == idStaff)
                                 from wr in _context.WarrantyRecords
@@ -210,7 +216,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 });
             }
 
-            return response;
+            return await Task.FromResult(response);
         }
 
         public async Task<int> UpdateStaffTask(UpdateRepairManagementRequest request )
@@ -264,7 +270,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     StatusBill = 0,
                 };
                 await _context.Bills.AddAsync(bill);
-                var checkMail = _mail.SendEmailAsync(
+                var checkMail = await _mail.SendEmailAsync(
                             new NotificationParameters
                             {
                                 CustomerName = customer.CustomerName,
@@ -281,7 +287,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
             else if (request.StatusTask == 2) 
             {
-                var checkMail = _mail.SendEmailAsync(
+                var checkMail = await _mail.SendEmailAsync(
                            new NotificationParameters
                            {
                                CustomerName = customer.CustomerName,

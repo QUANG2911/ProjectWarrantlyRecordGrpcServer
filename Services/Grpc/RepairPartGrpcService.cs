@@ -17,7 +17,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<GetListRepairPartResponse> ListRepairPartManagement(GetListRepairPartRequest request, ServerCallContext context)
         {
-            var response = _repairPart.GetListRepairPart();
+            var response = await _repairPart.GetListRepairPart();
 
             if (response.ToListRepairPast.Count == 0) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có danh sách linh kiện ??"));

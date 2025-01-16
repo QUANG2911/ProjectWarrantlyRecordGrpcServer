@@ -7,12 +7,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
     public interface IStaffTaskService
     {
         Task<int> CreateNewStaffTask(CreateRepairManagementRequest itemInsertStaffTask);
-        ReadRepairManagementResponse GetStaffTaskDone(int idStaffTask);
+        Task<ReadRepairManagementResponse> GetStaffTaskDone(int idStaffTask);
 
-        GetListRepairManagementResponse GetListStaffTask(int idStaff);
+        Task<GetListRepairManagementResponse> GetListStaffTask(int idStaff);
 
-        ReadItemCustomerResponse GetStaffTaskCustomer(int idStaffTask);
-        void UpdateWorkScheduleAutomatically(int  idStaff);
+        Task<ReadItemCustomerResponse> GetStaffTaskCustomer(int idStaffTask);
+        Task<string> UpdateWorkScheduleAutomatically(int  idStaff);
         Task<int> UpdateStaffTask(UpdateRepairManagementRequest idStaffTask);
     }
 }

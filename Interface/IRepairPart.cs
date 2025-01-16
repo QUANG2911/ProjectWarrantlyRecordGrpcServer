@@ -4,6 +4,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface IRepairPart
     {
-        GetListRepairPartResponse GetListRepairPart();
+        Task<GetListRepairPartResponse> GetListRepairPart();
     }
 }

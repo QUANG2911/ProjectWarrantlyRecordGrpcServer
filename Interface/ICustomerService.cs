@@ -6,8 +6,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface ICustomerService
     {
-        GetListCustomerManagementResponse GetListCustomer();
-        ReadCustomerManagementResponse GetDetailCustomer(int IdCustomer);
+        Task<GetListCustomerManagementResponse> GetListCustomer();
+        Task<ReadCustomerManagementResponse> GetDetailCustomer(int IdCustomer);
 
     }
 }

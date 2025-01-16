@@ -5,7 +5,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface IMailSevice
     {
-        string SendEmailAsync(NotificationParameters notificationParameters, int TypeTable);
+        Task<string> SendEmailAsync(NotificationParameters notificationParameters, int TypeTable);
 
     }
 }

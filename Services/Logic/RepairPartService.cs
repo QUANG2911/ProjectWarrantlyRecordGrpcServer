@@ -13,7 +13,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             _context = context;
         }
 
-        public GetListRepairPartResponse GetListRepairPart()
+        public async Task<GetListRepairPartResponse> GetListRepairPart()
         {
             var listRepairPart = _context.RepairParts.ToList();
             var response = new GetListRepairPartResponse();
@@ -26,7 +26,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     RepairPartName = item.RepairPartName,
                 });
             }
-            return response;
+            return await Task.FromResult(response);
         }
     }
 }

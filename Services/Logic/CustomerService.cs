@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Model;
@@ -15,7 +16,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         {
             _context = context;
         }
-        public GetListCustomerManagementResponse GetListCustomer()
+        public async Task<GetListCustomerManagementResponse> GetListCustomer()
         {
             var listCustomer = _context.Customers.ToList();
             var response = new GetListCustomerManagementResponse();
@@ -30,12 +31,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     CustomerAdrress = item.CustomerAddress
                 });
             }
-            return response;
+            return await Task.FromResult(response);
         }
 
-        public ReadCustomerManagementResponse GetDetailCustomer(int IdCustomer)
+        public async Task<ReadCustomerManagementResponse> GetDetailCustomer(int IdCustomer)
         {
-            var customer = _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
+            var customer =  _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
             if (customer == null) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tồn tại thông tin khách hàng này ??"));
             }
@@ -70,7 +71,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 });
             }
 
-            return response;
+            return await Task.FromResult(response);
         }
     }
 }

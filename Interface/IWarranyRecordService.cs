@@ -4,6 +4,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Interface
 {
     public interface IWarranyRecordService
     {
-        GetWarrantyListResponse GetListWarrantyList();
+        Task<GetWarrantyListResponse> GetListWarrantyList();
     }
 }

@@ -10,7 +10,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class TokenService : ITokenService
     {
-        public string CheckTokenIdStaff(int idStaff, ServerCallContext context)
+        public async Task<string> CheckTokenIdStaff(int idStaff, ServerCallContext context)
         {
             var authHeader = context.RequestHeaders.FirstOrDefault(h => h.Key == "authorization");
 
@@ -42,10 +42,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Token hết hạn out"));
             }    
 
-            return "done";
+            return await Task.FromResult("done");
         }
 
-        public string GetToken(int idStaff)
+        public async Task<string> GetToken(int idStaff)
         {
             var secretKey = "ThisIsA32CharLongSecretKey12345_123_344_122";
 
@@ -67,7 +67,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
             string jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return jwt;
+            return await Task.FromResult(jwt);
         }
     }
 }
