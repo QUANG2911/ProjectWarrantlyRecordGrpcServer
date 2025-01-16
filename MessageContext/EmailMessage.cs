@@ -8,7 +8,7 @@ namespace ProjectWarrantlyRecordGrpcServer.MessageContext
 {
     public class EmailMessage
     {
-        private string signCompany = "";
+        //private string signCompany = "";
         private string companyName = "Cty TNHH A";
         private string companyAdrress = "123 Nguyễn Thị Định";
         private string bankName = "Mb bank";

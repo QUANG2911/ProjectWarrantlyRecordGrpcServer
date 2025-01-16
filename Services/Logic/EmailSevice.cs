@@ -20,14 +20,26 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
             if (notificationParameters.TypeMessage == "Bill")
             {
+                if (notificationParameters.DateBill == null || notificationParameters.listRepairParts == null)
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin sửa chữa"));
+                }
                 return emailMessage.PrintBillMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.DateBill, notificationParameters.TotalBill, notificationParameters.listRepairParts).ToMessageBody();
             }
             else if (notificationParameters.TypeMessage == "RegistrationTask")
             {
+                if(notificationParameters.ReasonBringFix == null)
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin sửa chữa"));
+                }    
                 return emailMessage.PrintRepairRegistrationConfirmation(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.ReasonBringFix).ToMessageBody();
             }
             else if (notificationParameters.TypeMessage == "ReceiptTask")
             {
+                if(notificationParameters.StaffName == null)
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin nhân viên phụ trách"));
+                }    
                 return emailMessage.PrintRepairReceiptMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.StaffName).ToMessageBody();
             }
             else if (notificationParameters.TypeMessage == "RejectTask")
