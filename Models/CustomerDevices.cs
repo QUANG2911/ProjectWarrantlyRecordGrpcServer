@@ -10,6 +10,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public int IdDevice { get; set; }
         [MaxLength(30)]
         public required string DeviceName { get; set; }
-        public ICollection<WarrantyRecord>? warrantyRecords { get; set; }
+        public ICollection<WarrantyRecord>? WarrantyRecords { get; set; }
     }
 }

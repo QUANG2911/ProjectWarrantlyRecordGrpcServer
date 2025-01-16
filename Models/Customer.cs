@@ -20,6 +20,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         [MaxLength(10)]
         public required string CustomerPhone { get; set; }
 
-        public ICollection<WarrantyRecord>? warrantyRecords { get; set; }
+        public ICollection<WarrantyRecord>? WarrantyRecords { get; set; }
     }
 }

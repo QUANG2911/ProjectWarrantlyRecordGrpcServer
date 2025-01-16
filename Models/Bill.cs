@@ -17,6 +17,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public int? IdTask { get; set; }
 
         [ForeignKey("IdTask")]
-        public StaffTask? staffTask { get; set; }
+        public StaffTask? StaffTask { get; set; }
     }
 }

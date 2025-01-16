@@ -12,9 +12,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
         private readonly IStaffTaskService _staffTask;
         private readonly ILogger<StaffTaskGrpcService> _logger;
         private readonly ITokenService _tokenService;
-        public StaffTaskGrpcService(IStaffTaskService staffTask, ILogger<StaffTaskGrpcService> logger, ITokenService tokenService)
+        public StaffTaskGrpcService(IStaffTaskService StaffTask, ILogger<StaffTaskGrpcService> logger, ITokenService tokenService)
         {
-            _staffTask = staffTask;
+            _staffTask = StaffTask;
             _logger = logger;
             _tokenService = tokenService;
         }

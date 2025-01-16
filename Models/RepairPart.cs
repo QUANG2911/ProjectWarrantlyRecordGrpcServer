@@ -12,6 +12,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public required string RepairPartName { get; set; }
         public int Price { get; set; }
         public DateOnly DateOfManuFacture { get; set; }
-        public ICollection<RepairDetail>? repairDetails { get; set; }
+        public ICollection<RepairDetail>? RepairDetails { get; set; }
     }
 }

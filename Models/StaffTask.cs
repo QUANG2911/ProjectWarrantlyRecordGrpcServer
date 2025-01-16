@@ -16,13 +16,13 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public required string ReasonBringFix { get; set; }
 
         [ForeignKey("IdWarantyRecord")]
-        public WarrantyRecord? warrantyRecord { get; set; }
+        public WarrantyRecord? WarrantyRecord { get; set; }
         [ForeignKey("IdStaff")]
-        public Staff? staff { get; set; }
+        public Staff? Staff { get; set; }
 
-        public ICollection<Bill>? bills { get; set; }
+        public ICollection<Bill>? Bills { get; set; }
 
-        public ICollection<RepairDetail>? repairDetails { get; set; }
+        public ICollection<RepairDetail>? RepairDetails { get; set; }
 
     }
 }

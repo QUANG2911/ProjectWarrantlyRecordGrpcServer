@@ -19,11 +19,11 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public async Task<string> GetLogin(int idStaff, string password)
         {
-            var staff = _context.Staffs.Where( p=> p.IdStaff == idStaff && password == p.Pass).FirstOrDefault();
-            if (staff == null) {
+            var Staff = _context.Staffs.Where( p=> p.IdStaff == idStaff && password == p.Pass).FirstOrDefault();
+            if (Staff == null) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin tài khoản nhân viên này"));
             }
-            return await Task.FromResult(staff.StaffPosition);
+            return await Task.FromResult(Staff.StaffPosition);
         }
     }
 }

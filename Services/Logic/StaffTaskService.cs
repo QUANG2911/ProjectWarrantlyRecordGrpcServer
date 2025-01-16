@@ -35,14 +35,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
             int idTask = _context.StaffTasks.Count() + 1;
 
-            var staffTask = new StaffTask
+            var StaffTask = new StaffTask
             {
                 IdWarantyRecord = itemInsertStaffTask.IdWarrantRecord,
                 DateOfTask = DateOnly.FromDateTime(DateTime.Now),
                 StatusTask = -1, 
                 ReasonBringFix = itemInsertStaffTask.ReasonBringFix,
             };
-            await _context.StaffTasks.AddAsync(staffTask);
+            await _context.StaffTasks.AddAsync(StaffTask);
             _context.SaveChanges();
 
             var result = _context.StaffTasks.Where(p =>p.IdTask == idTask).FirstOrDefault();
@@ -99,18 +99,18 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public async Task<ReadItemCustomerResponse> GetStaffTaskCustomer(int idTask)
         {
-            var staffTask = _context.StaffTasks.Where(p => p.IdTask == idTask).FirstOrDefault();
-            if (staffTask == null)
+            var StaffTask = _context.StaffTasks.Where(p => p.IdTask == idTask).FirstOrDefault();
+            if (StaffTask == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu sửa chữa này"));
             }
-            var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == staffTask.IdWarantyRecord).FirstOrDefault();
+            var WarrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == StaffTask.IdWarantyRecord).FirstOrDefault();
 
-            if (warrantyRecord == null)
+            if (WarrantyRecord == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu bảo hành này"));
             }
-            int IdCustomer = warrantyRecord.IdCustomer;
+            int IdCustomer = WarrantyRecord.IdCustomer;
             var customer = _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
             if (customer == null)
             {
@@ -119,11 +119,11 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
             var response = new ReadItemCustomerResponse
             {
-                IdTask = staffTask.IdTask,
+                IdTask = StaffTask.IdTask,
                 CustomerName = customer.CustomerName,
                 CustomerPhone = customer.CustomerPhone,
-                ReasonBringFix = staffTask.ReasonBringFix,
-                StatusTask = staffTask.StatusTask,
+                ReasonBringFix = StaffTask.ReasonBringFix,
+                StatusTask = StaffTask.StatusTask,
             };
           
             return await Task.FromResult(response);
@@ -147,10 +147,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     checkStatusStaff.Status = 1;
                     _context.SaveChanges();
 
-                    var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == stafTask.IdTask).FirstOrDefault();
-                    if (warrantyRecord != null)
+                    var WarrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == stafTask.IdTask).FirstOrDefault();
+                    if (WarrantyRecord != null)
                     {
-                        var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
+                        var customer = _context.Customers.Where(p => p.IdCustomer == WarrantyRecord.IdCustomer).FirstOrDefault();
                         if (customer != null)
                         {
                             var checkMail = await _mail.SendEmailAsync(
@@ -158,7 +158,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                             {
                                 CustomerName = customer.CustomerName,
                                 IdTask = stafTask.IdTask,
-                                IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                                IdWarrantyRecord = WarrantyRecord.IdWarrantRecord,
                                 CustomerEmail = customer.CustomerEmail,
                                 subject = "Thông báo xác nhận tiếp nhận phiếu sửa chữa của quý khách",
                                 TypeMessage = "ReceiptTask",
@@ -222,20 +222,20 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         public async Task<int> UpdateStaffTask(UpdateRepairManagementRequest request )
         {
 
-            var staffTask = _context.StaffTasks.Find(request.IdTask);
+            var StaffTask = _context.StaffTasks.Find(request.IdTask);
             int total = 0;
-            if (staffTask == null) {
+            if (StaffTask == null) {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có công việc này"));
             }
 
-            var staff = _context.Staffs.Find(request.IdStaff);
-            if (staff == null)
+            var Staff = _context.Staffs.Find(request.IdStaff);
+            if (Staff == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có nhân viên này ??? sao gán được dữ liệu hay vậy"));
             }
 
-            staffTask.StatusTask = request.StatusTask;
-            staff.Status = 0;
+            StaffTask.StatusTask = request.StatusTask;
+            Staff.Status = 0;
             if( request.ToListUpdateRepairPart.Count > 0)
             {
                 foreach( var item in request.ToListUpdateRepairPart )
@@ -249,12 +249,12 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     total = total + item.Amount*item.Price;
                 }    
             }
-            var warrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == request.IdTask).FirstOrDefault();
-            if (warrantyRecord == null)
+            var WarrantyRecord = _context.WarrantyRecords.Where(p => p.IdWarrantRecord == request.IdTask).FirstOrDefault();
+            if (WarrantyRecord == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu bảo hành này ??? sao gán được dữ liệu hay vậy"));
             }
-            var customer = _context.Customers.Where(p => p.IdCustomer == warrantyRecord.IdCustomer).FirstOrDefault();
+            var customer = _context.Customers.Where(p => p.IdCustomer == WarrantyRecord.IdCustomer).FirstOrDefault();
             if (customer == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có khách hàng này ??? sao gán được dữ liệu hay vậy"));
@@ -275,7 +275,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                             {
                                 CustomerName = customer.CustomerName,
                                 IdTask = request.IdTask,
-                                IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                                IdWarrantyRecord = WarrantyRecord.IdWarrantRecord,
                                 CustomerEmail = customer.CustomerEmail,
                                 subject = "Thông báo xác nhận xử lý phiếu sửa chữa của quý khách",
                                 TypeMessage = "Bill",
@@ -292,7 +292,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                            {
                                CustomerName = customer.CustomerName,
                                IdTask = request.IdTask,
-                               IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                               IdWarrantyRecord = WarrantyRecord.IdWarrantRecord,
                                CustomerEmail = customer.CustomerEmail,
                                subject = "Thông báo hủy bỏ đơn sửa chữa và bảo hành",
                                TypeMessage = "RejectTask",
@@ -311,7 +311,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             //           throw rpcEx; // Giữ nguyên lỗi RPC đã được định nghĩa.
             //      }
 
-            return staffTask.IdTask;
+            return StaffTask.IdTask;
         }
     }
 }

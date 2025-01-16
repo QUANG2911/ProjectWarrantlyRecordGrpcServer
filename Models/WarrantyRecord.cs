@@ -12,14 +12,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public required int IdCustomer { get; set; }
         public  DateOnly DateOfResig { get; set; }
         public DateOnly TimeEnd { get; set; }
-        public int status { get; set; }
+        public int Status { get; set; }
 
         [ForeignKey("IdCustomer")]
         public Customer? Customer { get; set; }
 
         [ForeignKey("IdDevice")]
-        public CustomerDevices? customerDevice  { get; set; }
+        public CustomerDevices? CustomerDevice  { get; set; }
 
-        public ICollection<StaffTask>? staffTasks { get; set; }
+        public ICollection<StaffTask>? StaffTasks { get; set; }
     }
 }

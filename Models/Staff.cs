@@ -19,6 +19,6 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public required string Pass { get; set; }
         public int Status { get; set; }
 
-        public ICollection<StaffTask>? staffTasks { get; set; }
+        public ICollection<StaffTask>? StaffTasks { get; set; }
     }
 }
