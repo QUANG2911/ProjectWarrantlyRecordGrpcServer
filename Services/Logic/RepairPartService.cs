@@ -1,4 +1,5 @@
-﻿using ProjectWarrantlyRecordGrpcServer.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Protos;
 
@@ -15,7 +16,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public async Task<GetListRepairPartResponse> GetListRepairPart()
         {
-            var listRepairPart = _context.RepairParts.ToList();
+            var listRepairPart = await _context.RepairParts.ToListAsync();
             var response = new GetListRepairPartResponse();
             foreach (var item in listRepairPart)
             {
@@ -26,7 +27,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     RepairPartName = item.RepairPartName,
                 });
             }
-            return await Task.FromResult(response);
+            return response;
         }
     }
 }

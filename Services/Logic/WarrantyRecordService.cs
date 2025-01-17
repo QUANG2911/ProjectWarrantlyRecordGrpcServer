@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
 using ProjectWarrantlyRecordGrpcServer.Protos;
@@ -16,19 +17,20 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public async Task<GetWarrantyListResponse> GetListWarrantyList()
         {
-            var listWarrantyRecord = from wr in _context.WarrantyRecords
-                                     from cs in _context.Customers
-                                     from dv in _context.CustomerDevices
-                                     where wr.IdCustomer == cs.IdCustomer && dv.IdDevice == wr.IdDevice
-                                     select new
-                                     {
-                                         wr.IdWarrantRecord,
-                                         wr.TimeEnd,
-                                         wr.DateOfResig,
-                                         cs.CustomerName,
-                                         dv.DeviceName,
-                                         cs.IdCustomer,
-                                     };
+            var listWarrantyRecord = await Task.FromResult( 
+                                            from wr in _context.WarrantyRecords.AsNoTracking()
+                                            from cs in _context.Customers.AsNoTracking()
+                                            from dv in _context.CustomerDevices.AsNoTracking()
+                                            where wr.IdCustomer == cs.IdCustomer && dv.IdDevice == wr.IdDevice
+                                            select new
+                                            {
+                                                 wr.IdWarrantRecord,
+                                                 wr.TimeEnd,
+                                                 wr.DateOfResig,
+                                                 cs.CustomerName,
+                                                 dv.DeviceName,
+                                                 cs.IdCustomer,
+                                            });
             if (listWarrantyRecord == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không có phiếu bảo hành này"));
@@ -46,7 +48,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     IdWarrantyRecord = item.IdWarrantRecord
                 });
             }
-            return await Task.FromResult(response);
+            return response;
         }
     }
 }

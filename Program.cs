@@ -15,10 +15,19 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // add Serilog -> folder log tự sinh
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Day) //Chọn rolling DAY HAY MINUTE THÌ NÓ SẼ LOADING LOG THEO KIỂU CHỈ ĐỊNH
-    .CreateLogger();
+//Log.Logger = new LoggerConfiguration()
+//    .MinimumLevel.Information()
+//    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Day) //Chọn rolling DAY HAY MINUTE THÌ NÓ SẼ LOADING LOG THEO KIỂU CHỈ ĐỊNH
+//    .CreateLogger();
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config
+        .MinimumLevel.Information()
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day);
+});
 //Thay thế hệ thống logging mặc định của ASP.NET Core bằng Serilog
 builder.Host.UseSerilog();
 
@@ -30,6 +39,8 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 builder.Services.AddScoped<IWarranyRecordService, WarrantyRecordService>();
 builder.Services.AddScoped<IMailSevice, EmailSevice>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICheckOut,CheckOutService>();
+builder.Services.AddScoped<IDataService, DataService>();
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
 

@@ -10,68 +10,24 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ApplicationDbContext _context;
-
-        public CustomerService(ApplicationDbContext context)
+        private readonly ICheckOut _checkOut;
+        private readonly IDataService _dataService;
+        public CustomerService(ICheckOut checkOut, IDataService dataService)
         {
-            _context = context;
+            _checkOut = checkOut;
+            _dataService = dataService;
         }
+
         public async Task<GetListCustomerManagementResponse> GetListCustomer()
         {
-            var listCustomer = _context.Customers.ToList();
-            var response = new GetListCustomerManagementResponse();
-            foreach (var item in listCustomer)
-            {
-                response.ToCustomerList.Add(new GetItemInListCustomerResponse
-                {
-                    IdCusomer = item.IdCustomer,
-                    CustomerName = item.CustomerName,
-                    CustomerPhone = item.CustomerPhone,
-                    CustomerEmail = item.CustomerEmail,
-                    CustomerAdrress = item.CustomerAddress
-                });
-            }
-            return await Task.FromResult(response);
+            var response =  await _dataService.GetListCustomerAsync();
+            return response;
         }
 
-        public async Task<ReadCustomerManagementResponse> GetDetailCustomer(int IdCustomer)
+        public async Task<ReadCustomerManagementResponse> GetDetailCustomer(int idCustomer)
         {
-            var customer =  _context.Customers.Where(p => p.IdCustomer == IdCustomer).FirstOrDefault();
-            if (customer == null) {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tồn tại thông tin khách hàng này ??"));
-            }
-            var listDeviceOfCustomer = from wr in _context.WarrantyRecords.Where(p => p.IdCustomer == IdCustomer)
-                                       from dc in _context.CustomerDevices
-                                       where dc.IdDevice == wr.IdDevice
-                                       select new
-                                       {
-                                           dc.DeviceName,
-                                           wr.IdWarrantRecord,
-                                           wr.TimeEnd,
-                                           wr.DateOfResig,
-                                           dc.IdDevice
-                                       };
-
-            var response = new ReadCustomerManagementResponse();
-
-            foreach (var item in listDeviceOfCustomer)
-            {
-                response.ToDeviceList.Add(new ReadItemDeviceCustomerManagementResponse
-                {
-                    IdCusomer = customer.IdCustomer,
-                    CustomerName = customer.CustomerName,
-                    CustomerEmail = customer.CustomerEmail,
-                    CustomerPhone = customer.CustomerPhone,
-                    CustomerAdrress = customer.CustomerAddress,
-                    CustomerDevice = item.DeviceName,
-                    IdWarrantReport = item.IdWarrantRecord,
-                    DateOfWarrant = item.DateOfResig.ToString(),
-                    TimeEnd = item.TimeEnd.ToString(),
-                    IdDevice = item.IdDevice,
-                });
-            }
-
-            return await Task.FromResult(response);
+            var response = await _dataService.GetListDetalOfCustomerAsync(idCustomer);
+            return response;
         }
     }
 }

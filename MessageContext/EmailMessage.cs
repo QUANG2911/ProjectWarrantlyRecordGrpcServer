@@ -87,7 +87,7 @@ namespace ProjectWarrantlyRecordGrpcServer.MessageContext
             return bodyBuilder;
         }
 
-        public BodyBuilder PrintRepairReceiptMessage(string customerName, int idTask, string staffName)
+        public BodyBuilder PrintRepairReceiptMessage(string customerName, int idTask)
         {
             var bodyBuilder = new BodyBuilder();
             bodyBuilder.HtmlBody = $@"
@@ -100,7 +100,7 @@ namespace ProjectWarrantlyRecordGrpcServer.MessageContext
                         </head>
                         <body>
                             <p>Kính gửi {customerName},</p>
-                            <p>Chúng tôi đã nhận được phiếu sửa chữa mà quý khách vừa đăng ký. Chúng tôi xin thông báo rằng phiếu sửa chữa có mã {idTask} của quý khách đã được nhân viên kỹ thuật {staffName}  tiếp nhận và xử lý.</p>
+                            <p>Chúng tôi đã nhận được phiếu sửa chữa mà quý khách vừa đăng ký. Chúng tôi xin thông báo rằng phiếu sửa chữa có mã {idTask} của quý khách đã được nhân viên kỹ thuật tiếp nhận và xử lý.</p>
                             <p>Nhân viên kỹ thuật sẽ liên hệ với quý khách trong thời gian sớm nhất để xác nhận thông tin chi tiết và thống nhất về các bước sửa chữa tiếp theo.</p>
                             <p>Nếu quý khách có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi qua</p>                             
                                 <li>Số điện thoại: {hotline}</li>

@@ -14,7 +14,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class EmailSevice : IMailSevice
     {
-        public MimeEntity SendNotification(NotificationParameters notificationParameters)
+        public async Task<MimeEntity> SendNotification(NotificationParameters notificationParameters)
         {
             EmailMessage emailMessage = new EmailMessage();
 
@@ -24,7 +24,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 {
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin sửa chữa"));
                 }
-                return emailMessage.PrintBillMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.DateBill, notificationParameters.TotalBill, notificationParameters.listRepairParts).ToMessageBody();
+                return await Task.FromResult(emailMessage.PrintBillMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.DateBill, notificationParameters.TotalBill, notificationParameters.listRepairParts).ToMessageBody());
             }
             else if (notificationParameters.TypeMessage == "RegistrationTask")
             {
@@ -32,19 +32,15 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 {
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin sửa chữa"));
                 }    
-                return emailMessage.PrintRepairRegistrationConfirmation(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.ReasonBringFix).ToMessageBody();
+                return await Task.FromResult(emailMessage.PrintRepairRegistrationConfirmation(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord, notificationParameters.ReasonBringFix).ToMessageBody());
             }
             else if (notificationParameters.TypeMessage == "ReceiptTask")
             {
-                if(notificationParameters.StaffName == null)
-                {
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm được tên thông tin nhân viên phụ trách"));
-                }    
-                return emailMessage.PrintRepairReceiptMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.StaffName).ToMessageBody();
+                return await Task.FromResult(emailMessage.PrintRepairReceiptMessage(notificationParameters.CustomerName, notificationParameters.IdTask).ToMessageBody());
             }
             else if (notificationParameters.TypeMessage == "RejectTask")
             {
-                return emailMessage.PrintRejectRepairMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord).ToMessageBody();
+                return await Task.FromResult(emailMessage.PrintRejectRepairMessage(notificationParameters.CustomerName, notificationParameters.IdTask, notificationParameters.IdWarrantyRecord).ToMessageBody());
             }
             else
             {
@@ -61,7 +57,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             message.To.Add(new MailboxAddress(notificationParameters.CustomerName, "buiminhquangquang8@gmail.com"));
             message.Subject = notificationParameters.subject;
 
-            message.Body = SendNotification(notificationParameters);
+            message.Body = await SendNotification(notificationParameters);
 
             try
             {
@@ -80,7 +76,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 result = "fail";                
             }
            
-            return await Task.FromResult(result);
+            return result;
         }
     }
 }

@@ -17,16 +17,17 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
             _staffTask = StaffTask;
             _logger = logger;
             _tokenService = tokenService;
-        }
+        } 
 
         public override async Task<CreateRepairManagementResponse> CreateRepairManagement(CreateRepairManagementRequest request, ServerCallContext context)
         {
-            if (request.IdWarrantRecord == 0 || request.CustomerPhone == null || request.CustomerEmail == null || request.CustomerName == null)
+            if (request.IdWarrantRecord == 0 || request.CustomerPhone == null || request.CustomerEmail == null || request.CustomerName == null || request.DeviceName == null || request.ReasonBringFix == null || request.CustomerAddress == null)
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
             }
 
             var result = await _staffTask.CreateNewStaffTask(request);
+
             _logger.LogInformation("Thông tin tạo mới phiếu sửa chữa: IdWarrantRecord:{" + request.IdWarrantRecord + "},CustomerPhone:{"+ request.CustomerPhone + "},CustomerEmail{"+ request.CustomerEmail + "},CustomerName {" + request.CustomerName+"}và kết quả trả ra là response:{" + result + "}");
             return await Task.FromResult(new CreateRepairManagementResponse { IdTask = result });
         }

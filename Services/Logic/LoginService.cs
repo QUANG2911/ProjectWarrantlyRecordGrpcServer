@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
@@ -11,19 +12,17 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
     public class LoginService :ILoginService
     {
         private readonly ApplicationDbContext _context;
-
-        public LoginService(ApplicationDbContext context)
+        private readonly ICheckOut _checkOut;
+        public LoginService(ApplicationDbContext context, ICheckOut checkOut)
         {
             _context = context;
+            _checkOut = checkOut;
         }
 
         public async Task<string> GetLogin(int idStaff, string password)
         {
-            var Staff = _context.Staffs.Where( p=> p.IdStaff == idStaff && password == p.Pass).FirstOrDefault();
-            if (Staff == null) {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không tìm thấy thông tin tài khoản nhân viên này"));
-            }
-            return await Task.FromResult(Staff.StaffPosition);
+            var Staff = await _checkOut.CheckStaffLoginByIdStaffPassAsync(idStaff, password);
+            return Staff.StaffPosition;
         }
     }
 }
