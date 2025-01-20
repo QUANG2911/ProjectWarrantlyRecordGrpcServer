@@ -121,12 +121,13 @@ namespace ProjectWarrantlyRecordGrpcServer.MessageContext
             var tableRowsBuilder = new StringBuilder();
             foreach (var item in listRepairParts.ToListUpdateRepairPart)
             {
+                string formattedPrice = item.Price.ToString("N0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"));
                 tableRowsBuilder.Append($@"
                 <tr>
                     <td>{item.IdRepairPart}</td>
                     <td>{item.RepairPartName}</td>
                     <td>{item.Amount}</td>
-                    <td>{item.Price}</td>
+                    <td>{formattedPrice}</td>
                 </tr>");
             }
             //test

@@ -10,11 +10,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class CustomerService : ICustomerService
     {
-        private readonly ICheckOut _checkOut;
         private readonly IDataService _dataService;
-        public CustomerService(ICheckOut checkOut, IDataService dataService)
+        public CustomerService( IDataService dataService)
         {
-            _checkOut = checkOut;
             _dataService = dataService;
         }
 

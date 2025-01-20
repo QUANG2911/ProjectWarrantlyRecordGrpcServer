@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ProjectWarrantlyRecordGrpcServer.Data;
 using ProjectWarrantlyRecordGrpcServer.Interface;
+using ProjectWarrantlyRecordGrpcServer.MessageContext;
 using ProjectWarrantlyRecordGrpcServer.Services.Grpc;
 using ProjectWarrantlyRecordGrpcServer.Services.Logic;
 using Serilog;
@@ -26,7 +27,8 @@ builder.Host.UseSerilog((context, config) =>
         .MinimumLevel.Information()
         .Enrich.FromLogContext()
         .WriteTo.Console()
-        .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day);
+        .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Minute)
+        .CreateLogger();
 });
 //Thay thế hệ thống logging mặc định của ASP.NET Core bằng Serilog
 builder.Host.UseSerilog();
@@ -41,8 +43,14 @@ builder.Services.AddScoped<IMailSevice, EmailSevice>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICheckOut,CheckOutService>();
 builder.Services.AddScoped<IDataService, DataService>();
+builder.Services.AddSingleton<EmailQueue>();
+builder.Services.AddHostedService<EmailBackgroundService>();
+
 // Add services to the container.
 builder.Services.AddGrpc().AddJsonTranscoding();
+
+//////
+
 
 
 // Cấu hình kết nối angular

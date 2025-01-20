@@ -12,14 +12,14 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class StaffTaskService : IStaffTaskService
     {
-        private readonly IMailSevice _mail;
         private readonly ICheckOut _checkout;
         private readonly IDataService _dataService;
-        public StaffTaskService(IMailSevice mail, ICheckOut checkout, IDataService dataService)
+        private readonly EmailQueue _emailQueue;
+        public StaffTaskService( ICheckOut checkout, IDataService dataService, EmailQueue emailQueue)
         {
-            _mail = mail;
             _checkout = checkout;
             _dataService = dataService;
+            _emailQueue = emailQueue;
         }
 
         public async Task<int> CreateNewStaffTask(CreateRepairManagementRequest itemInsertStaffTask)
@@ -33,23 +33,19 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             var newStaffTask = await _dataService.AddNewStaffTaskAsync(itemInsertStaffTask);
 
             //Add email
-            var checkMail = await _mail.SendEmailAsync(
-                new NotificationParameters
-                {
-                    CustomerName = itemInsertStaffTask.CustomerName,
-                    IdTask = newStaffTask,
-                    IdWarrantyRecord = itemInsertStaffTask.IdWarrantRecord,
-                    CustomerEmail = itemInsertStaffTask.CustomerEmail,
-                    subject = "Xác nhận đăng ký phiếu sửa chữa thành công",
-                    TypeMessage = "RegistrationTask",
-                    ReasonBringFix = itemInsertStaffTask.ReasonBringFix
-                }, 0);
-
-            if(checkMail != "done")
+            // Thêm email vào hàng đợi
+            _emailQueue.Enqueue(new NotificationParameters
             {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "gửi mail bị lỗi"));
-            }
-            return newStaffTask;
+                CustomerName = itemInsertStaffTask.CustomerName,
+                IdTask = 1,
+                IdWarrantyRecord = itemInsertStaffTask.IdWarrantRecord,
+                CustomerEmail = itemInsertStaffTask.CustomerEmail,
+                subject = "Xác nhận đăng ký phiếu sửa chữa thành công",
+                TypeMessage = "RegistrationTask",
+                ReasonBringFix = itemInsertStaffTask.ReasonBringFix
+            });
+
+            return 1;
         }
 
         public async Task<ReadRepairManagementResponse> GetStaffTaskDone(int idStaffTask)
@@ -85,10 +81,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         public async Task<string> UpdateWorkScheduleAutomatically(int idStaff)
         {
             var task = await _dataService.GetTaskNotHaveStaffDoAsync();
-            if(task != null)
+            if (task != null)
             {
                 var checkUpdateSchedule = await _dataService.UpdateUpdateWorkScheduleAsync(idStaff);
-                if(checkUpdateSchedule != 0)
+                if (checkUpdateSchedule != 0)
                 {
                     var WarrantyRecord = await _checkout.CheckWarrantyRecordByIdWarrantAsync(checkUpdateSchedule);
                     if (WarrantyRecord != null)
@@ -96,21 +92,20 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                         var customer = await _checkout.CheckCustomerByIdCustomerAsync(WarrantyRecord.IdCustomer);
                         if (customer != null)
                         {
-                            var checkMail = await _mail.SendEmailAsync(
-                            new NotificationParameters
-                            {
-                                CustomerName = customer.CustomerName,
-                                IdTask = task.IdTask,
-                                IdWarrantyRecord = WarrantyRecord.IdWarrantRecord,
-                                CustomerEmail = customer.CustomerEmail,
-                                subject = "Thông báo xác nhận tiếp nhận phiếu sửa chữa của quý khách",
-                                TypeMessage = "ReceiptTask"
-                            }, 0);
+                            _emailQueue.Enqueue(new NotificationParameters
+                             {
+                                 CustomerName = customer.CustomerName,
+                                 IdTask = task.IdTask,
+                                 IdWarrantyRecord = task.IdWarantyRecord,
+                                 CustomerEmail = customer.CustomerEmail,
+                                 subject = "Thông báo xác nhận tiếp nhận phiếu sửa chữa của quý khách",
+                                 TypeMessage = "ReceiptTask"
+                             });
                         }
                     }
-                }                    
+                }
             }
-            return "done";
+            return await Task.FromResult("done");
         }
 
 
@@ -130,7 +125,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
         public async Task<int> UpdateStaffTask(UpdateRepairManagementRequest request )
         {
-            
+
             //CHECK
             var staffTask = await _checkout.CheckStaffTaskByIdTaskAsync(request.IdTask);
 
@@ -149,34 +144,32 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 
             if (request.StatusTask == 1)
             {
-               var bill = await _dataService.AddNewBillAsync(idTask, totalBill);
-                var checkMail = await _mail.SendEmailAsync(
-                            new NotificationParameters
-                            {
-                                CustomerName = customer.CustomerName,
-                                IdTask = request.IdTask,
-                                IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
-                                CustomerEmail = customer.CustomerEmail,
-                                subject = "Thông báo xác nhận xử lý phiếu sửa chữa của quý khách",
-                                TypeMessage = "Bill",
-                                DateBill = DateTime.Now.ToString("dd/MM/yyyy"),
-                                TotalBill = totalBill,
-                                listRepairParts = request
-                            }, 1);
-        
+                var bill = await _dataService.AddNewBillAsync(idTask, totalBill);
+                _emailQueue.Enqueue(new NotificationParameters
+                {
+                    CustomerName = customer.CustomerName,
+                    IdTask = idTask,
+                    IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                    CustomerEmail = customer.CustomerName,
+                    subject = "Thông báo xác nhận xử lý phiếu sửa chữa của quý khách",
+                    TypeMessage = "Bill",
+                    DateBill = DateTime.Now.ToString("dd/MM/yyyy"),
+                    TotalBill = totalBill,
+                    listRepairParts = request
+                });
+
             }
             else if (request.StatusTask == 2) 
             {
-                var checkMail = await _mail.SendEmailAsync(
-                           new NotificationParameters
-                           {
-                               CustomerName = customer.CustomerName,
-                               IdTask = request.IdTask,
-                               IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
-                               CustomerEmail = customer.CustomerEmail,
-                               subject = "Thông báo hủy bỏ đơn sửa chữa và bảo hành",
-                               TypeMessage = "RejectTask",
-                           }, 0);
+                _emailQueue.Enqueue(new NotificationParameters
+                {
+                    CustomerName = customer.CustomerName,
+                    IdTask = idTask,
+                    IdWarrantyRecord = warrantyRecord.IdWarrantRecord,
+                    CustomerEmail = customer.CustomerName,
+                    subject = "Thông báo hủy bỏ đơn sửa chữa khách hàng đăng ký",
+                    TypeMessage = "RejectTask",
+                });
             }
            
 
@@ -189,7 +182,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             //           throw rpcEx; // Giữ nguyên lỗi RPC đã được định nghĩa.
             //      }
 
-            return staffTask.IdTask;
+            return 1;
         }
     }
 }

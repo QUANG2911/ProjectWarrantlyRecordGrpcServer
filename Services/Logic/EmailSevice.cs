@@ -48,7 +48,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
             }
         }
 
-        public async Task<string> SendEmailAsync(NotificationParameters notificationParameters,int TypeTable)
+        public async Task<string> SendEmailAsync(NotificationParameters notificationParameters)
         {
             string result = "";
             var message = new MimeMessage();
@@ -76,7 +76,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 result = "fail";                
             }
            
-            return result;
+            return await Task.FromResult(result);
         }
     }
 }

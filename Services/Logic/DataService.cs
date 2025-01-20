@@ -54,6 +54,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                     repairDetail.Amount = item.Amount;
 
                     await _context.RepairDetails.AddAsync(repairDetail);
+                    await _context.SaveChangesAsync();
                     total = total + item.Amount * item.Price;
                 }
             }
@@ -70,6 +71,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
                 StatusBill = 0,
             };
             await _context.Bills.AddAsync(bill);
+            await _context.SaveChangesAsync();
             return bill;
         }
 
@@ -79,8 +81,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         {
             var listStaffTask = await Task.FromResult(
                                    from rp in _context.RepairParts.AsNoTracking()
-                                   from rd in _context.RepairDetails.AsNoTracking().Where(p => p.IdTask == idStaffTask)
-                                   where rp.IdRepairPart == rd.IdRepairPart
+                                   join rd in _context.RepairDetails.AsNoTracking().Where(p => p.IdTask == idStaffTask) on rp.IdRepairPart equals  rd.IdRepairPart
                                    select new
                                    {
                                        rp.IdRepairPart,
@@ -105,7 +106,8 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         public async Task<StaffTask> GetTaskNotHaveStaffDoAsync()
         {
             var staffTask = await _context.StaffTasks.Where(p => p.IdStaff == null).OrderByDescending(p => p.DateOfTask).FirstOrDefaultAsync();
-
+            if (staffTask == null)
+                return new StaffTask();
             return staffTask ;
         }
 
@@ -113,9 +115,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
         {
             var listStaffTask = await Task.FromResult(
                                 from st in _context.StaffTasks.AsNoTracking().Where(p => p.IdStaff == idStaff)
-                                from wr in _context.WarrantyRecords.AsNoTracking()
-                                from cs in _context.Customers.AsNoTracking()
-                                where st.IdWarantyRecord == wr.IdWarrantRecord && wr.IdCustomer == cs.IdCustomer
+                                join wr in _context.WarrantyRecords.AsNoTracking() on st.IdWarantyRecord equals wr.IdWarrantRecord
+                                join cs in _context.Customers.AsNoTracking()
+                                on wr.IdCustomer equals cs.IdCustomer
                                 select new
                                 {
                                     st.IdTask,

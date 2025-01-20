@@ -11,11 +11,9 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Logic
 {
     public class LoginService :ILoginService
     {
-        private readonly ApplicationDbContext _context;
         private readonly ICheckOut _checkOut;
-        public LoginService(ApplicationDbContext context, ICheckOut checkOut)
+        public LoginService( ICheckOut checkOut)
         {
-            _context = context;
             _checkOut = checkOut;
         }
 

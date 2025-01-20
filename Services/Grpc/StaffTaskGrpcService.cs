@@ -21,10 +21,10 @@ namespace ProjectWarrantlyRecordGrpcServer.Services.Grpc
 
         public override async Task<CreateRepairManagementResponse> CreateRepairManagement(CreateRepairManagementRequest request, ServerCallContext context)
         {
-            if (request.IdWarrantRecord == 0 || request.CustomerPhone == null || request.CustomerEmail == null || request.CustomerName == null || request.DeviceName == null || request.ReasonBringFix == null || request.CustomerAddress == null)
-            {
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
-            }
+            //if (request.IdWarrantRecord == 0 || request.CustomerPhone == null || request.CustomerEmail == null || request.CustomerName == null || request.DeviceName == null || request.ReasonBringFix == null || request.CustomerAddress == null)
+            //{
+            //    throw new RpcException(new Status(StatusCode.InvalidArgument, "Không được để trống các thông tin truyền"));
+            //}
 
             var result = await _staffTask.CreateNewStaffTask(request);
 

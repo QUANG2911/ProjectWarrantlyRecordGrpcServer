@@ -13,7 +13,7 @@ namespace ProjectWarrantlyRecordGrpcServer.Model
         public int IdWarantyRecord { get; set; }
         public DateOnly DateOfTask { get; set; }
         public int StatusTask { get; set; }
-        public required string ReasonBringFix { get; set; }
+        public string? ReasonBringFix { get; set; }
 
         [ForeignKey("IdWarantyRecord")]
         public WarrantyRecord? WarrantyRecord { get; set; }
