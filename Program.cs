@@ -16,20 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // add Serilog -> folder log tự sinh
-//Log.Logger = new LoggerConfiguration()
-//    .MinimumLevel.Information()
-//    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Day) //Chọn rolling DAY HAY MINUTE THÌ NÓ SẼ LOADING LOG THEO KIỂU CHỈ ĐỊNH
-//    .CreateLogger();
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Verbose()
+    .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Day) //Chọn rolling DAY HAY MINUTE THÌ NÓ SẼ LOADING LOG THEO KIỂU CHỈ ĐỊNH
+    .CreateLogger();
 
-builder.Host.UseSerilog((context, config) =>
-{
-    config
-        .MinimumLevel.Information()
-        .Enrich.FromLogContext()
-        .WriteTo.Console()
-        .WriteTo.File("Log/log.txt", rollingInterval: RollingInterval.Minute)
-        .CreateLogger();
-});
 //Thay thế hệ thống logging mặc định của ASP.NET Core bằng Serilog
 builder.Host.UseSerilog();
 
